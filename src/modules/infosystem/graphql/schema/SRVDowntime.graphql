@@ -1,0 +1,87 @@
+enum SRVDowntimeOutcome {
+  ended
+  upcomming
+}
+
+enum SRVDowntimeSeverity {
+  OUTAGE
+}
+
+enum SRVDowntimeClassification {
+  SCHEDULED
+  UNSCHEDULED
+}
+
+type SRVDowntime {
+  id: ID
+  downtimePKey: String
+  classification: SRVDowntimeClassification
+  severity: SRVDowntimeSeverity
+  startDate: Int
+  endDate: Int
+  formatedStartDate: String
+  formatedEndDate: String
+  serviceType: String
+  gocPortalUrl: String
+  outcome: SRVDowntimeOutcome
+  site: Site
+  siteService: SiteService
+}
+
+input SRVDowntime_Filter {
+  id: ID
+  downtimePKey: FilterStringOperators
+  classification: SRVDowntimeClassification
+  severity: SRVDowntimeSeverity
+  startDate: FilterIntegerOperators
+  endDate: FilterIntegerOperators
+  formatedStartDate: FilterStringOperators
+  formatedEndDate: FilterStringOperators
+  serviceType: FilterStringOperators
+  gocPortalUrl: FilterStringOperators
+  outcome: SRVDowntimeOutcome
+  site: Site_Filter
+  siteSevrice: SiteService_Filter
+  #or: [SRVDowntime_Filter]
+  #and: [SRVDowntime_Filter]
+}
+
+enum SRVDowntime_Sort {
+  id_asc
+  ##downtimePKey_asc
+  ##classification_asc
+  ##severity_asc
+  ##startDate_asc
+  ##endDate_asc
+  ##formatedStartDate_asc
+  ##formatedEndDate_asc
+  ##serviceType_asc
+  ##gocPortalUrl_asc
+  ##outcome_asc
+
+  id_desc
+  ##downtimePKey_desc
+  ##classification_desc
+  ##severity_desc
+  ##startDate_desc
+  ##endDate_desc
+  ##formatedStartDate_desc
+  ##formatedEndDate_desc
+  ##serviceType_desc
+  ##gocPortalUrl_desc
+  ##outcome_desc
+}
+
+type SRVDowntimeCollection {
+  totalCount: Int
+  count: Int
+  limit: Int
+  skip: Int
+  sort: [SRVDowntime_Sort]
+  items: [SRVDowntime]
+}
+
+extend type Query {
+  SRVDowntimeById(id: ID!): SRVDowntime
+  SRVDowntimes(filter: SRVDowntime_Filter, limit: Int, skip: Int, sort: [SRVDowntime_Sort]): SRVDowntimeCollection
+}

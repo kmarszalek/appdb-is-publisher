@@ -1,0 +1,172 @@
+type SiteServiceTemplate {
+  # Local Information System Identifier
+  id: ID
+  # GLUE2EntityName
+  entityName: String
+  # GLUE2ResourceID
+  resourceID: String
+  # The total amount of physical RAM in one Execution Environment instance; if many jobs run in the same instance they compete for the total RAM. [MB] (GLUE2ExecutionEnvironmentMainMemorySize@topBDII)
+  executionEnvironmentMainMemorySize: Int
+  # The number of physical CPUs in one ExecutionEnvironment instance, i.e. the number of sockets per Worker Node. [0..1] (GLUE2ExecutionEnvironmentPhysicalCPUs@topBDII)
+  executionEnvironmentPhysicalCPUs: Int
+  # Condensed information about the multiplicity of both physical CPUs and cores available in an execution environment instance. [0..1] (GLUE2ExecutionEnvironmentCPUMultiplicity@topBDII)
+  executionEnvironmentCPUMultiplicity: String
+  # The general family to which the Execution Environment operating system belongs (GLUE2ExecutionEnvironmentOSFamily@topBDII)
+  executionEnvironmentOSFamily: String
+  # True if direct inbound network connectivity is available to a running job, even if limited, e.g. by firewall rule (GLUE2ExecutionEnvironmentConnectivityIn@topBDII)
+  executionEnvironmentConnectivityIn: Boolean
+  # True if direct outbound network connectivity is available from a running job, even if limited, e.g. by firewall rules. (GLUE2ExecutionEnvironmentConnectivityOut@topBDII)
+  executionEnvironmentConnectivityOut: Boolean
+  # The name of the physical CPU model, as defined by the vendor [0..1] (GLUE2ExecutionEnvironmentCPUModel@topBDII)
+  executionEnvironmentCPUModel: String
+  # (GLUE2ExecutionEnvironmentDiskSize@topBDII)
+  executionEnvironmentDiskSize: Int,
+  # The platform architecture of this Execution Environment. (GLUE2ExecutionEnvironmentPlatform@topBDII)
+  executionEnvironmentPlatform: String,
+  # The name of the physical CPU vendor. Free format, but it SHOULD correspond to the name by which the vendor is generally known. [0..1] (GLUE2ExecutionEnvironmentCPUVendor@topBDII)
+  executionEnvironmentCPUVendor: String,
+  # True if the Execution Environment is hosted within a virtual machine; in this case, the values of the other attributes are related to the virtualized environment and not to the hosting environment. [0..1] (GLUE2ExecutionEnvironmentVirtualMachine@topBDII)
+  executionEnvironmentVirtualMachine: Boolean,
+  # (GLUE2ExecutionEnvironmentComputingManagerForeignKey@topBDII)
+  executionEnvironmentComputingManagerForeignKey: String
+  # (GLUE2ResourceManagerForeignKey@topBDII)
+  resourceManagerForeignKey: String
+  # (GLUE2EntityOtherInfo@topBDII)
+  entityOtherInfo: String
+  # hash@is
+  hash: String
+  site: Site
+  service: SiteService
+  images(filter: SiteServiceImage_Filter, limit: Int, skip: Int, sort: [SiteServiceImage_Sort]): SiteServiceImageCollection
+}
+
+input SiteServiceTemplate_Filter {
+  # Local Information System Identifier
+  id: String
+  # GLUE2EntityName
+  entityName: FilterStringOperators
+  # GLUE2ResourceID
+  resourceID: FilterStringOperators
+  # GLUE2ExecutionEnvironmentMainMemorySize
+  executionEnvironmentMainMemorySize: FilterIntegerOperators
+  # GLUE2ExecutionEnvironmentPhysicalCPUs
+  executionEnvironmentPhysicalCPUs: FilterIntegerOperators
+  # GLUE2ExecutionEnvironmentCPUMultiplicity
+  executionEnvironmentCPUMultiplicity: FilterStringOperators
+  # GLUE2ExecutionEnvironmentOSFamily
+  executionEnvironmentOSFamily: FilterStringOperators
+  # GLUE2ExecutionEnvironmentConnectivityIn
+  executionEnvironmentConnectivityIn: Boolean
+  # GLUE2ExecutionEnvironmentConnectivityOut
+  executionEnvironmentConnectivityOut: Boolean
+  # GLUE2ExecutionEnvironmentCPUModel
+  executionEnvironmentCPUModel: FilterStringOperators
+  # GLUE2ExecutionEnvironmentDiskSize
+  executionEnvironmentDiskSize: FilterIntegerOperators
+  # GLUE2ExecutionEnvironmentPlatform
+  executionEnvironmentPlatform: FilterStringOperators
+  # GLUE2ExecutionEnvironmentCPUVendor
+  executionEnvironmentCPUVendor: FilterStringOperators
+  # GLUE2ExecutionEnvironmentVirtualMachine
+  executionEnvironmentVirtualMachine: Boolean
+  # GLUE2ExecutionEnvironmentComputingManagerForeignKey
+  executionEnvironmentComputingManagerForeignKey: FilterStringOperators
+  # GLUE2ResourceManagerForeignKey
+  resourceManagerForeignKey: FilterStringOperators
+  # GLUE2EntityOtherInfo
+  entityOtherInfo: FilterStringOperators
+  # hash@is
+  hash: String
+  site: Site_Filter,
+  service: SiteService_Filter
+  images: SiteServiceImage_Filter
+  #hasSiteServiceImages: Boolean
+  #or: [SiteServiceTemplate_Filter]
+  #and: [SiteServiceTemplate_Filter]
+}
+
+enum SiteServiceTemplate_Sort {
+  # Ascenting order by Local Inforation System Identifier
+  id_asc
+  # Ascenting order by GLUE2EntityName
+  ##entityName_asc
+  # Ascenting order by GLUE2ResourceID
+  ##resourceID_asc
+  # Ascenting order by GLUE2ExecutionEnvironmentMainMemorySize
+  ##executionEnvironmentMainMemorySize_asc
+  # Ascenting order by GLUE2ExecutionEnvironmentPhysicalCPUs
+  ##executionEnvironmentPhysicalCPUs_asc
+  # Ascenting order by GLUE2ExecutionEnvironmentCPUMultiplicity
+  ##executionEnvironmentCPUMultiplicity_asc
+  # Ascenting order by GLUE2ExecutionEnvironmentOSFamily
+  ##executionEnvironmentOSFamily_asc
+  # Ascenting order by GLUE2ExecutionEnvironmentConnectivityIn
+  ##executionEnvironmentConnectivityIn_asc
+  # Ascenting order by GLUE2ExecutionEnvironmentConnectivityOut
+  ##executionEnvironmentConnectivityOut_asc
+  # Ascenting order by GLUE2ExecutionEnvironmentCPUModel
+  ##executionEnvironmentCPUModel_asc
+  # Ascenting order by GLUE2ExecutionEnvironmentDiskSize
+  ##executionEnvironmentDiskSize_asc
+  # Ascenting order by GLUE2ExecutionEnvironmentPlatform
+  ##executionEnvironmentPlatform_asc
+  # Ascenting order by GLUE2ExecutionEnvironmentCPUVendor
+  ##executionEnvironmentCPUVendor_asc
+  # Ascenting order by GLUE2ExecutionEnvironmentVirtualMachine
+  ##executionEnvironmentVirtualMachine_asc
+  # Ascenting order by GLUE2ExecutionEnvironmentComputingManagerForeignKey
+  ##executionEnvironmentComputingManagerForeignKey_asc
+  # Ascenting order by GLUE2ResourceManagerForeignKey
+  ##resourceManagerForeignKey_asc
+  # Ascenting order by GLUE2EntityOtherInfo
+  ##entityOtherInfo_asc
+
+  # Descenting order by Local Inforation System Identifier
+  id_desc
+  # Descenting order by GLUE2EntityName
+  ##entityName_desc
+  # Descenting order by GLUE2ResourceID
+  ##resourceID_desc
+  # Descenting order by GLUE2ExecutionEnvironmentMainMemorySize
+  ##executionEnvironmentMainMemorySize_desc
+  # Descenting order by GLUE2ExecutionEnvironmentPhysicalCPUs
+  ##executionEnvironmentPhysicalCPUs_desc
+  # Descenting order by GLUE2ExecutionEnvironmentCPUMultiplicity
+  ##executionEnvironmentCPUMultiplicity_desc
+  # Descenting order by GLUE2ExecutionEnvironmentOSFamily
+  ##executionEnvironmentOSFamily_desc
+  # Descenting order by GLUE2ExecutionEnvironmentConnectivityIn
+  ##executionEnvironmentConnectivityIn_desc
+  # Descenting order by GLUE2ExecutionEnvironmentConnectivityOut
+  ##executionEnvironmentConnectivityOut_desc
+  # Descenting order by GLUE2ExecutionEnvironmentCPUModel
+  ##executionEnvironmentCPUModel_desc
+  # Descenting order by GLUE2ExecutionEnvironmentDiskSize
+  ##executionEnvironmentDiskSize_desc
+  # Descenting order by GLUE2ExecutionEnvironmentPlatform
+  ##executionEnvironmentPlatform_desc
+  # Descenting order by GLUE2ExecutionEnvironmentCPUVendor
+  ##executionEnvironmentCPUVendor_desc
+  # Descenting order by GLUE2ExecutionEnvironmentVirtualMachine
+  ##executionEnvironmentVirtualMachine_desc
+  # Descenting order by GLUE2ExecutionEnvironmentComputingManagerForeignKey
+  ##executionEnvironmentComputingManagerForeignKey_desc
+  # Descenting order by GLUE2ResourceManagerForeignKey
+  ##resourceManagerForeignKey_desc
+  # Descenting order by GLUE2EntityOtherInfo
+  ##entityOtherInfo_desc
+}
+
+type SiteServiceTemplateCollection {
+  totalCount: Int
+  count: Int
+  limit: Int
+  skip: Int
+  sort: [SiteServiceTemplate_Sort]
+  items: [SiteServiceTemplate]
+}
+
+extend type Query {
+  siteServiceTemplateById(id: ID!): SiteServiceTemplate
+  siteServiceTemplates(filter: SiteServiceTemplate_Filter, limit: Int, skip: Int, sort: [SiteServiceTemplate_Sort]): SiteServiceTemplateCollection
+}

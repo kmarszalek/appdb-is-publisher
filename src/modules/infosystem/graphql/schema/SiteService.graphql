@@ -1,0 +1,266 @@
+type SiteServiceLocation {
+  # GLUE2LocationID/GLUE2LocationID
+  id: String
+  # GLUE2LocationID/GLUE2LocationLongitude
+  longitude: String,
+  # GLUE2LocationID/GLUE2LocationLatitude
+  latitude: String
+  # GLUE2LocationID/GLUE2LocationCountry
+  country: String
+  # GLUE2LocationID/GLUE2LocationDomainForeignKey
+  domainForeignKey: String
+}
+
+input SiteServiceLocation_Filter {
+  # GLUE2LocationID/GLUE2LocationID
+  id: String
+  # GLUE2LocationID/GLUE2LocationLongitude
+  longitude: FilterStringOperators,
+  # GLUE2LocationID/GLUE2LocationLatitude
+  latitude: FilterStringOperators
+  # GLUE2LocationID/GLUE2LocationCountry
+  country: FilterStringOperators
+  # GLUE2LocationID/GLUE2LocationDomainForeignKey
+  domainForeignKey: FilterStringOperators
+}
+
+# Represents a service provided by a Site in the information system
+# Services may contain one or more VM image references and execution templates.
+type SiteService {
+  # Local Information System Identifier
+  id: ID
+  # SiteEndpointPKey@gocdb
+  endpointPKey: String
+  # SiteEndpointInProduction@gocdb
+  isInProduction: Boolean
+  # SiteEndpointGocPortalUrl@gocdb
+  gocPortalUrl: String
+  # Network location of an endpoint,which enables a specific component of the Service to be contacted. (GLUE2EndpointURL@topBDII)
+  endpointURL: String
+  # A global unique ID (GLUE2EndpointID@topBDII)
+  endpointID: String
+  # The identification name of the primary protocol supported by the endpoint interface. (GLUE2EndpointInterfaceName@topBDII)
+  endpointInterfaceName: String
+  # The version of the primary interface protocol (free format). [0..*] (GLUE2EndpointInterfaceVersion@topBDII)
+  endpointInterfaceVersion: String
+  # The technology used to implement the endpoint interface. [0..1] (GLUE2EndpointTechnology@topBDII)
+  endpointTechnology: String
+  # The maturity of the endpoint in terms of the quality of the software components which implement it. (GLUE2EndpointQualityLevel@topBDII)
+  endpointQualityLevel: String
+  # The provided capability according to the OGSA architecture classification. [*] (GLUE2EndpointCapability@topBDII)
+  endpointCapabilities: [String]
+  # A state specifying whether the Endpoint is currently accepting new requests, and whether it is currently servicing requests which have already been accepted.(GLUE2EndpointServingState@topBDII)
+  endpointServingState: String
+  # A state representing the current health of the Endpoint in terms of its ability to properly deliver the expected functionality. (GLUE2EndpointHealthState@topBDII)
+  endpointHealthState: String
+  # The name of the main organization implementing this software component (free format, but the chosen names SHOULD be clearly identifiable with the organisation). [0..1] (GLUE2EndpointImplementor@topBDII)
+  endpointImplementor: String
+  # The name of the implementation (as defined by the Implementor). [0..1] (GLUE2EndpointImplementationName@topBDII)
+  endpointImplementationName: String
+  # The version of the implementation (the syntax is defined by the Implementor, but MAY be: major.minor.patch). [0..1] (GLUE2EndpointImplementationVersion@topBDII)
+  endpointImplementationVersion: String
+  # (GLUE2LocationID@topBDII)
+  location: SiteServiceLocation
+  # (GLUE2ComputingEndpointComputingServiceForeignKey@topBDII)
+  computingEndpointComputingServiceForeignKey: String
+  # (GLUE2EndpointServiceForeignKey@topBDII)
+  endpointServiceForeignKey: String
+  # (GLUE2ManagerID@topBDII)
+  managerID: String
+  # Name of the software product adopted as manager (GLUE2ManagerProductName@topBDII)
+  managerProductName: String
+  # Name of the software product adopted as manager [0..1]  (GLUE2ManagerProductVersion@topBDII)
+  managerProductVersion: String
+  # The total number of physical CPUs accessible via any of the available Endpoints and managed by this Computing Manager (there is onephysical CPU per socket). This value SHOULD represent the total installed capacity, i.e. including resources which are temporarily unavailable.(GLUE2ComputingManagerTotalLogicalCPUs@topBDII)
+  computingManagerTotalLogicalCPUs: Int
+  # Total size of the working area available to all single-slot Grid jobs, either as a shared area across all the Execution Environments (WorkingAreaShared is true) or local to each Execution Environment (WorkingAreaShared is false). If the Computing Manager supports individual quotas per job/user, this is not advertised. In the case of a non-shared working area with a different local space  allocation on each node, the advertised total size <b>SHOULD</b> be the minimum available across all the Execution Environment instances. [0..1] [GB] (GLUE2ComputingManagerWorkingAreaTotal@topBDII)
+  computingManagerWorkingAreaTotal: Int
+  # (GLUE2EntityOtherInfo@topBDII)
+  entityOtherInfo: String
+  # Raw list of all images the  service provides (no filtering or paging)
+  imageList: [SiteServiceImage]
+  # Raw list of all templates the service provides (no filtering or paging)
+  templateList: [SiteServiceTemplate]
+  # Site that the current service belongs to
+  site: Site
+  # Registered downtimes in GocDB system regarding the current service
+  serviceDowntimes: [SiteServiceDowntime]
+  # Operational status regarding the current service as reported by the argo.egi.eu service
+  serviceStatus: SiteServiceStatus
+  # A collection of references to VM images the the current service provides
+  images(filter: SiteServiceImage_Filter, limit: Int, skip: Int, sort: [SiteServiceImage_Sort]): SiteServiceImageCollection
+  # A collection of templates the current service provides to be used for VM initialization
+  templates(filter: SiteServiceTemplate_Filter, limit: Int, skip: Int, sort: [SiteServiceTemplate_Sort]): SiteServiceTemplateCollection
+}
+
+
+input SiteService_Filter {
+  # Local Information System Identifier
+  id: ID
+  # SiteEndpointPKey@gocdb
+  endpointPKey: FilterStringOperators
+  # SiteEndpointInProduction@gocdb
+  isInProduction: Boolean
+  # SiteEndpointGocPortalUrl@gocdb
+  gocPortalUrl: FilterStringOperators
+  # GLUE2EndpointURL
+  endpointURL: FilterStringOperators
+  # GLUE2EndpointID
+  endpointID: FilterStringOperators
+  #GLUE2EndpointInterfaceName
+  endpointInterfaceName: FilterStringOperators
+  # GLUE2EndpointInterfaceVersion
+  endpointInterfaceVersion: FilterStringOperators
+  # GLUE2EndpointTechnology
+  endpointTechnology: FilterStringOperators
+  # GLUE2EndpointQualityLevel
+  endpointQualityLevel: FilterStringOperators
+  # GLUE2EndpointCapability
+  endpointCapabilities: FilterStringArrayOperators
+  # GLUE2EndpointServingState
+  endpointServingState: FilterStringOperators
+  # GLUE2EndpointHealthState
+  endpointHealthState: FilterStringOperators
+  # GLUE2EndpointImplementor
+  endpointImplementor: FilterStringOperators
+  # GLUE2EndpointImplementationName
+  endpointImplementationName: FilterStringOperators
+  # GLUE2EndpointImplementationVersion
+  endpointImplementationVersion: FilterStringOperators
+  # GLUE2LocationID
+  location: SiteServiceLocation_Filter
+  # GLUE2ComputingEndpointComputingServiceForeignKey
+  computingEndpointComputingServiceForeignKey: FilterStringOperators
+  # GLUE2EndpointServiceForeignKey
+  endpointServiceForeignKey: FilterStringOperators
+  # GLUE2ManagerID
+  managerID: String
+  # GLUE2ManagerProductName
+  managerProductName: FilterStringOperators
+  # GLUE2ManagerProductVersion
+  managerProductVersion: FilterStringOperators
+  # GLUE2ComputingManagerTotalLogicalCPUs
+  computingManagerTotalLogicalCPUs: FilterIntegerOperators
+  # GLUE2ComputingManagerWorkingAreaTotal
+  computingManagerWorkingAreaTotal: FilterIntegerOperators
+  # GLUE2EntityOtherInfo
+  entityOtherInfo: FilterStringOperators
+  # Filter by the service's images values
+  images: SiteServiceImage_Filter
+  # Filter by the service's templates values
+  templates: SiteServiceTemplate_Filter
+  # Filter by the hosting site's values
+  site: Site_Filter
+  #withDowntimeCount: FilterIntegerOperators
+  #withImageCount: FilterIntegerOperators
+  #withTemplateCount: FilterIntegerOperators
+  #or: [SiteService_Filter]
+  #and: [SiteService_Filter]
+}
+
+enum SiteService_Sort {
+  # Ascenting order by Local Information System Identifier
+  id_asc
+  # Ascenting order by SiteEndpointPKey@gocdb
+  ##endpointPKey_asc
+  # Ascenting order by SiteEndpointInProduction@gocdb
+  ##isInProduction_asc
+  # Ascenting order by SiteEndpointGocPortalUrl@gocdb
+  ##gocPortalUrl_asc
+  # Ascenting order by GLUE2EndpointURL
+  ##endpointURL_asc
+  # Ascenting order by GLUE2EndpointID
+  ##endpointID_asc
+  # Ascenting order by GLUE2EndpointInterfaceName
+  ##endpointInterfaceName_asc
+  # Ascenting order by GLUE2EndpointInterfaceVersion
+  ##endpointInterfaceVersion_asc
+  # Ascenting order by GLUE2EndpointTechnology
+  ##endpointTechnology_asc
+  # Ascenting order by GLUE2EndpointQualityLevel
+  ##endpointQualityLevel_asc
+  # Ascenting order by GLUE2EndpointServingState
+  ##endpointServingState_asc
+  # Ascenting order by GLUE2EndpointHealthState
+  ##endpointHealthState_asc
+  # Ascenting order by GLUE2EndpointImplementor
+  ##endpointImplementor_asc
+  # Ascenting order by GLUE2EndpointImplementationVersion
+  ##endpointImplementationVersion_asc
+  # Ascenting order by GLUE2ComputingEndpointComputingServiceForeignKey
+  ##computingEndpointComputingServiceForeignKey_asc
+  # Ascenting order by GLUE2EndpointServiceForeignKey
+  ##endpointServiceForeignKey_asc
+  # Ascenting order by GLUE2ManagerID
+  ##managerID_asc
+  # Ascenting order by GLUE2ManagerProductName
+  ##managerProductName_asc
+  # Ascenting order by GLUE2ManagerProductVersion
+  ##managerProductVersion_asc
+  # Ascenting order by GLUE2ComputingManagerTotalLogicalCPUs
+  ##computingManagerTotalLogicalCPUs_asc
+  # Ascenting order by GLUE2ComputingManagerWorkingAreaTotal
+  ##computingManagerWorkingAreaTotal_asc
+  # Ascenting order by GLUE2EntityOtherInfo
+  ##entityOtherInfo_asc
+
+  # Descenting order by Local Information System Identifier
+  id_desc
+  # Descenting order by SiteEndpointPKey@gocdb
+  ##endpointPKey_desc
+  # Descenting order by SiteEndpointInProduction@gocdb
+  ##isInProduction_desc
+  # Descenting order by SiteEndpointGocPortalUrl@gocdb
+  ##gocPortalUrl_desc
+  # Descenting order by GLUE2EndpointURL
+  ##endpointURL_desc
+  # Descenting order by GLUE2EndpointID
+  ##endpointID_desc
+  # Descenting order by GLUE2EndpointInterfaceName
+  ##endpointInterfaceName_desc
+  # Descenting order by GLUE2EndpointInterfaceVersion
+  ##endpointInterfaceVersion_desc
+  # Descenting order by GLUE2EndpointTechnology
+  ##endpointTechnology_desc
+  # Descenting order by GLUE2EndpointQualityLevel
+  ##endpointQualityLevel_desc
+  # Descenting order by GLUE2EndpointServingState
+  ##endpointServingState_desc
+  # Descenting order by GLUE2EndpointHealthState
+  ##endpointHealthState_desc
+  # Descenting order by GLUE2EndpointImplementor
+  ##endpointImplementor_desc
+  # Descenting order by GLUE2EndpointImplementationVersion
+  ##endpointImplementationVersion_desc
+  # Descenting order by GLUE2ComputingEndpointComputingServiceForeignKey
+  ##computingEndpointComputingServiceForeignKey_desc
+  # Descenting order by GLUE2EndpointServiceForeignKey
+  ##endpointServiceForeignKey_desc
+  # Descenting order by GLUE2ManagerID
+  ##managerID_desc
+  # Descenting order by GLUE2ManagerProductName
+  ##managerProductName_desc
+  # Descenting order by GLUE2ManagerProductVersion
+  ##managerProductVersion_desc
+  # Descenting order by GLUE2ComputingManagerTotalLogicalCPUs
+  ##computingManagerTotalLogicalCPUs_desc
+  # Descenting order by GLUE2ComputingManagerWorkingAreaTotal
+  ##computingManagerWorkingAreaTotal_desc
+  # Descenting order by GLUE2EntityOtherInfo
+  ##entityOtherInfo_desc
+}
+
+type SiteServiceCollection {
+  totalCount: Int
+  count: Int
+  limit: Int
+  skip: Int
+  sort: [SiteService_Sort]
+  items: [SiteService]
+}
+
+extend type Query {
+  siteServiceById(id: ID): SiteService
+  siteServiceByGocDBPKey(id: String): SiteService
+  siteServices(filter: SiteService_Filter, limit: Int, skip: Int, sort: [SiteService_Sort]): SiteServiceCollection
+}

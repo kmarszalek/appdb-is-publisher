@@ -1,0 +1,116 @@
+# scalar date;
+# scalar json;
+# scalar url;
+# scalar email;
+
+# Filter for string comparison
+input FilterStringOperators {
+  # Exact equal with given text
+  eq: String
+  # Not equal with given text
+  ne: String
+  # Contains given text. Can use '*' for any text.
+  like: String
+  # Contains given text (case insensitive). Can use '*' for any text.
+  ilike: String
+  # Does not contain given text. Can use '*' for any text.
+  nlike: String
+  # Does not contain given text (case insensitive). Can use '*' for any text.
+  nilike: String
+  # Must be equal with one of the values in the given array of text elements.
+  # If '*' wildcard is used in a text element it will act as 'like' operator.
+  oneOf: [String]
+  # Optional String comparisons
+  or: [FilterStringOperators]
+  # Mandatory String comparisons
+  and: [FilterStringOperators]
+}
+
+# Filter for integer comparisons
+input FilterIntegerOperators {
+  # Equal with given integer
+  eq: Int
+  # Not equal with given integer
+  ne: Int
+  # Greater than given integer
+  gt: Int
+  # Less than given integer
+  lt: Int
+  # Greater or equal with given integer
+  ge: Int
+  # Less or equal with given integer
+  le: Int
+  # Must be equal to one of the values in the given array of integers
+  oneOf: [Int]
+  # Value is between the two integers. If more than two integers are given the minimum and maximum values will be used.
+  between: [Float]
+  # Optional integer comparisons
+  #or: [FilterIntegerOperators]
+  # Mandatory integer comparisons
+  #and: [FilterIntegerOperators]
+}
+
+# Filter for integer comparisons
+input FilterFloatOperators {
+  # Equal with given float
+  eq: Float
+  # Not equal with given float
+  ne: Float
+  # Greater than given float
+  gt: Float
+  # Less than given float
+  lt: Float
+  # Greater or equal with given float
+  ge: Float
+  # Less or equal with given float
+  le: Float
+  # Must be equal to one of the values in the given array of integers
+  oneOf: [Float]
+  # Value is between the two floats. If more than two floats are given the minimum and maximum values will be used.
+  between: [Float]
+  # Optional float comparisons
+  #or: [FilterFloatOperators]
+  # Mandatory float comparisons
+  #and: [FilterFloatOperators]
+}
+
+# Filter operations on array of strings
+input FilterStringArrayOperators {
+  # Array contains given string value
+  contains: String
+  # Array contains given string value (case insensitive)
+  icontains: String
+  # Optional string array comparisons
+  #or: [FilterStringArrayOperators]
+  # Mandatory string array comparisons
+  #and: [FilterStringArrayOperators]
+}
+
+# Filter operations on array of integers
+input FilterIntegerArrayOperators {
+  # Array contains given integer value
+  contains: Int
+  # Optional integer array comparison
+  #or: [FilterIntegerArrayOperators]
+  # Mandatory integer array comparison
+  #and: [FilterIntegerArrayOperators]
+}
+
+# Filter operations on array of floats
+input FilterFloatArrayOperators {
+  # Array contains given float value
+  contains: Float
+  # Optional float array comparison
+  #or: [FilterFloatArrayOperators]
+  # Mandatory float array comparison
+  #and: [FilterFloatArrayOperators]
+}
+
+type Query {
+  version: String
+}
+
+
+schema {
+  query: Query
+}

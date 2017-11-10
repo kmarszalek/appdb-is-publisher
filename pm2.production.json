@@ -1,0 +1,12 @@
+{
+  "apps" : [{
+    "name" : "is-publisher",
+    "script"      : "bin/production",
+    "watch"       : false,
+    "instances"   : 4,
+    "exec_mode"   : "cluster",
+    "env_production" : {
+      "NODE_ENV": "production"
+    }
+  }]
+}

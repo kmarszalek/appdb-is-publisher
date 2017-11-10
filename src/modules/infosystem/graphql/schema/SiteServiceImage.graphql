@@ -1,0 +1,142 @@
+enum SiteServiceImageContentType {
+  vo
+  va
+}
+
+type SiteServiceImage {
+  # Local Information System identifier
+  id: ID
+  # GLUE2EntityName
+  entityName: String
+  # (GLUE2ApplicationEnvironmentID@topBDII)
+  applicationEnvironmentID: String
+  # GLUE2ApplicationEnvironmentRepository (appdb MPUri)
+  applicationEnvironmentRepository: String
+  # The name of the application or environment. (GLUE2ApplicationEnvironmentAppName@topBDII)
+  applicationEnvironmentAppName: String
+  # The version of the application or environment, as defined by the supplier. (GLUE2ApplicationEnvironmentAppVersion@topBDII)
+  applicationEnvironmentAppVersion: String
+  # A human-readable description of this application or environment. (GLUE2ApplicationEnvironmentDescription@topBDII)
+  applicationEnvironmentDescription: String
+  # GLUE2ApplicationEnvironmentComputingManagerForeignKey
+  applicationEnvironmentComputingManagerForeignKey: String
+  # ImageContentType@appdb
+  imageContentType: SiteServiceImageContentType
+  # ImageVoVmiInstanceId@appdb
+  imageVoVmiInstanceId: Int
+  # ImageVmiInstanceId@appdb
+  imageVmiInstanceId: Int
+  # ImageVmiInstanceId@appdb
+  imageVoVmiInstanceVO: String
+  # hash@is
+  hash: String
+  site: Site
+  service: SiteService
+  templates(filter: SiteServiceTemplate_Filter, limit: Int, skip: Int, sort: [SiteServiceTemplate_Sort]): SiteServiceTemplateCollection
+}
+
+input SiteServiceImage_Filter {
+  # Local Information System identifier
+  id: ID
+  # GLUE2EntityName
+  entityName: FilterStringOperators
+  # GLUE2ApplicationEnvironmentID
+  applicationEnvironmentID: FilterStringOperators
+  # GLUE2ApplicationEnvironmentRepository (appdb MPUri)
+  applicationEnvironmentRepository: FilterStringOperators
+  # GLUE2ApplicationEnvironmentAppName
+  applicationEnvironmentAppName: FilterStringOperators
+  # GLUE2ApplicationEnvironmentAppVersion
+  applicationEnvironmentAppVersion: FilterStringOperators
+  # GLUE2ApplicationEnvironmentDescription
+  applicationEnvironmentDescription: FilterStringOperators
+  # GLUE2ApplicationEnvironmentComputingManagerForeignKey
+  applicationEnvironmentComputingManagerForeignKey: FilterStringOperators
+  # ImageContentType@appdb
+  imageContentType: SiteServiceImageContentType
+  # ImageVoVmiInstanceId@appdb
+  imageVoVmiInstanceId: Int
+  # ImageVmiInstanceId@appdb
+  imageVmiInstanceId: Int
+  # ImageVmiInstanceId@appdb
+  imageVoVmiInstanceVO: String
+  # hash@is
+  hash: String
+  site: Site_Filter
+  service: SiteServiceImage_Filter
+  templates: SiteServiceTemplate_Filter,
+  #hasSiteServiceTemplates: Boolean
+  #or: [SiteServiceImage_Filter]
+  #and: [SiteServiceImage_Filter]
+}
+
+enum SiteServiceImage_Sort {
+  # Ascenting order by Local Information System identifier
+  id_asc
+  # Ascenting order by GLUE2EntityName
+  ##entityName_asc
+  # Ascenting order by GLUE2ApplicationEnvironmentID
+  ##applicationEnvironmentID_asc
+  # Ascenting order by GLUE2ApplicationEnvironmentRepository (appdb MPUri)
+  ##applicationEnvironmentRepository_asc
+  # Ascenting order by GLUE2ApplicationEnvironmentAppName
+  ##applicationEnvironmentAppName_asc
+  # Ascenting order by GLUE2ApplicationEnvironmentAppVersion
+  ##applicationEnvironmentAppVersion_asc
+  # Ascenting order by GLUE2ApplicationEnvironmentDescription
+  ##applicationEnvironmentDescription_asc
+  # Ascenting order by GLUE2ApplicationEnvironmentComputingManagerForeignKey
+  ##applicationEnvironmentComputingManagerForeignKey_asc
+  # Ascenting order by ImageContentType@appdb
+  ##imageContentType_asc
+  # Ascenting order by ImageVoVmiInstanceId@appdb
+  ##imageVoVmiInstanceId_asc
+  ### Ascenting order by ImageVmiInstanceId@appdb
+  ##imageVmiInstanceId_asc
+  # Ascenting order by ImageVmiInstanceVO@appdb
+  ##imageVoVmiInstanceVO_asc
+  # Ascenting order by hash@is
+  ##hash_asc
+
+  # Descenting order by Local Information System identifier
+  id_desc
+  # Descenting order by GLUE2EntityName
+  ##entityName_desc
+  # Descenting order by GLUE2ApplicationEnvironmentID
+  ##applicationEnvironmentID_desc
+  # Descenting order by GLUE2ApplicationEnvironmentRepository (appdb MPUri)
+  ##applicationEnvironmentRepository_desc
+  # Descenting order by GLUE2ApplicationEnvironmentAppName
+  ##applicationEnvironmentAppName_desc
+  # Descenting order by GLUE2ApplicationEnvironmentAppVersion
+  ##applicationEnvironmentAppVersion_desc
+  # Descenting order by GLUE2ApplicationEnvironmentDescription
+  ##applicationEnvironmentDescription_desc
+  # Descenting order by GLUE2ApplicationEnvironmentComputingManagerForeignKey
+  ##applicationEnvironmentComputingManagerForeignKey_desc
+  # Descenting order by ImageContentType@appdb
+  ##imageContentType_desc
+  # Descenting order by ImageVoVmiInstanceId@appdb
+  ##imageVoVmiInstanceId_desc
+  # Descenting order by ImageVmiInstanceId@appdb
+  ##imageVmiInstanceId_desc
+  # Descenting order by ImageVmiInstanceVO@appdb
+  ##imageVoVmiInstanceVO_desc
+  # Descenting order by hash@is
+  ##hash_desc
+}
+
+
+type SiteServiceImageCollection {
+  totalCount: Int
+  count: Int
+  limit: Int
+  skip: Int
+  sort: [SiteServiceImage_Sort]
+  items: [SiteServiceImage]
+}
+
+extend type Query {
+  siteServiceImageById(id: ID!): SiteServiceImage
+  siteServiceImages(filter: SiteServiceImage_Filter, limit: Int, skip: Int, sort: [SiteServiceImage_Sort]): SiteServiceImageCollection
+}

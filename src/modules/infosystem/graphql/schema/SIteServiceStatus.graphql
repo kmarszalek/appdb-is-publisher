@@ -1,0 +1,59 @@
+enum SiteServiceStatusType {
+  service
+}
+
+enum SiteServiceStatusValue {
+  OK
+  MISSING
+  CRITICAL
+}
+
+type SiteServiceStatus {
+  id: ID
+  type: SiteServiceStatusType
+  endpointGroup: String
+  value: SiteServiceStatusValue
+  timestamp: String
+  siteService: SiteService
+  site: Site
+}
+
+input SiteServiceStatus_Filter {
+  id: ID
+  type: SiteServiceStatusType
+  endpointGroup: FilterStringOperators
+  value: SiteServiceStatusValue
+  timestamp: FilterStringOperators
+  siteService: SiteService_Filter
+  site: Site_Filter
+  #or: [SiteServiceStatus_Filter]
+  #and: [SiteServiceStatus_Filter]
+}
+
+enum SiteServiceStatus_Sort {
+  id_asc
+  ##type_asc
+  ##endpointGroup_asc
+  ##value_asc
+  ##timestamp_asc
+
+  id_desc
+  ##type_desc
+  ##endpointGroup_desc
+  ##value_desc
+  ##timestamp_desc
+}
+
+type SiteServiceStatusCollection {
+  totalCount: Int
+  count: Int
+  limit: Int
+  skip: Int
+  sort: [SiteServiceStatus_Sort]
+  items: [SiteServiceStatus]
+}
+
+extend type Query {
+  siteServiceStatusById(id: ID!): SiteServiceStatus
+  siteServiceStatuses(filter: SiteServiceStatus_Filter, limit: Int, skip: Int, sort: [SiteServiceStatus_Sort]): SiteServiceStatusCollection
+}
