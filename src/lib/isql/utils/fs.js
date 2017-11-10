@@ -4,13 +4,13 @@ var readFile = Promise.promisify(require('fs').readFile);
 var path = require('path');
 
 function _fileLoader(file) {
-  console.log('loading: ' , path.basename(file));
+//  console.log('loading: ' , path.basename(file));
   return readFile(file, 'utf-8');
 }
 
 function _moduleLoader(file) {
   try {
-    console.log('requiring: ' , path.basename(file));
+//    console.log('requiring: ' , path.basename(file));
     return Promise.resolve(require(file).default);
   } catch (e) {
     return Promise.reject(e);

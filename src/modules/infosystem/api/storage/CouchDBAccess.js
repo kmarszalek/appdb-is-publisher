@@ -88,7 +88,7 @@ class CouchDBAccess {
       return this._db.get(args.id);
     }
 
-    logger('findOne', JSON.stringify(args), context);
+    //logger('findOne', JSON.stringify(args), context);
     return this._db.findAsync(query).then(result => {
       let docs = result.docs || [];
       docs = Array.isArray(docs) ? docs : [docs];
