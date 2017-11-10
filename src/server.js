@@ -47,6 +47,9 @@ function miscRoutes(router) {
 function _initServer(conf) {
   var app = express();
 
+  app.use(bodyParser.urlencoded({extended: true}));
+  app.use(bodyParser.json());
+
   app.use(
     '/graphql',
     [bodyParser.json(),
