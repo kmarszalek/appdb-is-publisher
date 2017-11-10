@@ -1,6 +1,6 @@
-import {existsSync} from 'fs';
-import _ from 'lodash';
-import path from 'path';
+var existsSync = require('fs').existsSync;
+var _ = require('lodash');
+var path = require('path');
 
 var config = {
   "server": {
@@ -23,7 +23,7 @@ var config = {
           "dialect": "couchdb",
           "options" :{
             "name": "_default",
-            "url": "",
+            "url": "https://nouser:nouser@localhost:6984",
             "collection": "testdb"
           }
         }
@@ -51,11 +51,11 @@ function loadConfig() {
   var instanceConfig = {};
 
   if (existsSync(_instanceConfigPath)) {
-    instanceConfig = require(_instanceConfigPath).default;
+    instanceConfig = require(_instanceConfigPath);
   }
 
   return _.merge(config, instanceConfig);
 };
 
 
-export default loadConfig();
+module.exports = loadConfig();

@@ -5,10 +5,10 @@
   "main": "src/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "node bin/dev",
+    "dev": "NODE_ENV=development NODE_TLS_REJECT_UNAUTHORIZED=0 node bin/dev",
     "clean": "rm -rf dist",
-    "build": "npm run clean && mkdir dist && node ./node_modules/babel-cli/bin/babel.js ./src -s -d ./dist",
-    "production": "npm run build && node bin/production"
+    "build": "npm run clean && mkdir dist && node ./node_modules/babel-cli/bin/babel.js ./src -s -d ./dist --copy-files",
+    "production": "npm run build && NODE_ENV=production NODE_TLS_REJECT_UNAUTHORIZED=0 node bin/production"
   },
   "author": "Nakos Alexander <nakos.al@iasa.gr>",
   "license": "Apache-2.0",

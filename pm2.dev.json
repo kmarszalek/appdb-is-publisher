@@ -6,7 +6,8 @@
     "instances"   : 1,
     "exec_mode"   : "cluster",
     "env_production" : {
-      "NODE_ENV": "development"
+      "NODE_ENV": "development",
+      "NODE_TLS_REJECT_UNAUTHORIZED": "0"
     }
   }]
 }
