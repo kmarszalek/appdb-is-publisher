@@ -25,11 +25,25 @@ var config = {
             "name": "_default",
             "url": "https://nouser:nouser@localhost:6984",
             "collection": "testdb"
+          },
+          "logger": {
+            "info": "/var/log/is-publisher/dbaccess/info.log",
+            "debug": "/var/log/is-publisher/dbaccess/debug.log"
           }
         }
       },
+      "graphql": {
+        "logger": {
+          "info": "/var/log/is-publisher/graphql/info.log",
+          "debug": "/var/log/is-publisher/graphql/debug.log"
+        }
+      },
       "rest": {
-        "graphQLUrl": "local"
+        "graphQLUrl": "local",
+        "logger": {
+          "info": "/var/log/is-publisher/rest/info.log",
+          "debug": "/var/log/is-publisher/rest/debug.log"
+        }
       }
     },
     "couchDBProxy": {

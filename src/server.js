@@ -54,7 +54,7 @@ function _initServer(conf) {
     '/graphql',
     [bodyParser.json(),
     function(req, res, next) {
-
+      let logger = conf.getLogger('graphql');
       let md5 = require('crypto').createHash('md5').update(JSON.stringify(req.body) + (new Date()).getTime()).digest("hex");
       req.md5Hash = md5;
       req.statistics = {
@@ -75,6 +75,7 @@ function _initServer(conf) {
           return '' + (this.totalRequestTime / 1000) + ' seconds';
         }
       };
+      //logger.log('info', 'GraphQL::' + md5 , 'Started request');
       console.log('\x1b[32m[GraphQL::' + md5 + ']\x1b[0m: Started request');
       res.on('finish', function() {
         let endedAt = new Date();
