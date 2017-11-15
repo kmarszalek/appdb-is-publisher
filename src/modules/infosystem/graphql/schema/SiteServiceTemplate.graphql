@@ -5,10 +5,14 @@ type SiteServiceTemplate {
   entityName: String
   # GLUE2ResourceID
   resourceID: String
+  # (GLUE2ResourceManagerForeignKey@topBDII)
+  resourceManager: String
   # The total amount of physical RAM in one Execution Environment instance; if many jobs run in the same instance they compete for the total RAM. [MB] (GLUE2ExecutionEnvironmentMainMemorySize@topBDII)
   executionEnvironmentMainMemorySize: Int
   # The number of physical CPUs in one ExecutionEnvironment instance, i.e. the number of sockets per Worker Node. [0..1] (GLUE2ExecutionEnvironmentPhysicalCPUs@topBDII)
   executionEnvironmentPhysicalCPUs: Int
+  # The number of logical CPUs in one ExecutionEnvironment instance (GLUE2ExecutionEnvironmentLogicalCPUs@topBDII)
+  executionEnvironmentLogicalCPUs: Int
   # Condensed information about the multiplicity of both physical CPUs and cores available in an execution environment instance. [0..1] (GLUE2ExecutionEnvironmentCPUMultiplicity@topBDII)
   executionEnvironmentCPUMultiplicity: String
   # The general family to which the Execution Environment operating system belongs (GLUE2ExecutionEnvironmentOSFamily@topBDII)
@@ -47,10 +51,14 @@ input SiteServiceTemplate_Filter {
   entityName: FilterStringOperators
   # GLUE2ResourceID
   resourceID: FilterStringOperators
+  # GLUE2ResourceManagerForeignKey
+  resourceManager: FilterStringOperators
   # GLUE2ExecutionEnvironmentMainMemorySize
   executionEnvironmentMainMemorySize: FilterIntegerOperators
   # GLUE2ExecutionEnvironmentPhysicalCPUs
   executionEnvironmentPhysicalCPUs: FilterIntegerOperators
+  # GLUE2ExecutionEnvironmentLogicalCPUs
+  executionEnvironmentLogicalCPUs: FilterIntegerOperators
   # GLUE2ExecutionEnvironmentCPUMultiplicity
   executionEnvironmentCPUMultiplicity: FilterStringOperators
   # GLUE2ExecutionEnvironmentOSFamily

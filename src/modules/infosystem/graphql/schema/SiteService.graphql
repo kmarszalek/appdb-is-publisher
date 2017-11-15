@@ -33,9 +33,13 @@ type SiteService {
   endpointPKey: String
   # SiteEndpointInProduction@gocdb
   isInProduction: Boolean
+  # SiteEndpointBeta@gocdb
+  beta: Boolean
   # SiteEndpointGocPortalUrl@gocdb
   gocPortalUrl: String
-  # Network location of an endpoint,which enables a specific component of the Service to be contacted. (GLUE2EndpointURL@topBDII)
+  # Indicates the type of site service. Eg cloud computing etc (SiteEndpointServiceType@local)
+  endpointServiceType: String
+  # Network location of an endpoint,which enables a specific component of the Service to be contacted. (GLUE2EndpointURL@topBDII or SiteEndpointUrl@gocdb)
   endpointURL: String
   # A global unique ID (GLUE2EndpointID@topBDII)
   endpointID: String
@@ -79,8 +83,12 @@ type SiteService {
   entityOtherInfo: String
   # Raw list of all images the  service provides (no filtering or paging)
   imageList: [SiteServiceImage]
+  # Total count of images this service provides (@local)
+  numberOfImages: Int
   # Raw list of all templates the service provides (no filtering or paging)
   templateList: [SiteServiceTemplate]
+  # Total count of templates this service provides (@local)
+  numberOfTemplates: Int
   # Site that the current service belongs to
   site: Site
   # Registered downtimes in GocDB system regarding the current service
@@ -101,8 +109,12 @@ input SiteService_Filter {
   endpointPKey: FilterStringOperators
   # SiteEndpointInProduction@gocdb
   isInProduction: Boolean
+  # SiteEndpointBeta@gocdb
+  beta: Boolean
   # SiteEndpointGocPortalUrl@gocdb
   gocPortalUrl: FilterStringOperators
+  # SiteEndpointServiceType@local
+  endpointServiceType: FilterStringOperators
   # GLUE2EndpointURL
   endpointURL: FilterStringOperators
   # GLUE2EndpointID
@@ -147,8 +159,12 @@ input SiteService_Filter {
   entityOtherInfo: FilterStringOperators
   # Filter by the service's images values
   images: SiteServiceImage_Filter
+  # Filter by service's total image count
+  numberOfImages: FilterIntegerOperators
   # Filter by the service's templates values
   templates: SiteServiceTemplate_Filter
+  # Filter by service's total template count
+  numberOfTemplates: FilterIntegerOperators
   # Filter by the hosting site's values
   site: Site_Filter
   #withDowntimeCount: FilterIntegerOperators

@@ -20,6 +20,8 @@ type SiteServiceImage {
   applicationEnvironmentDescription: String
   # GLUE2ApplicationEnvironmentComputingManagerForeignKey
   applicationEnvironmentComputingManagerForeignKey: String
+  # ImageBaseMpUri@appdb
+  imageBaseMpUri: String
   # ImageContentType@appdb
   imageContentType: SiteServiceImageContentType
   # ImageVoVmiInstanceId@appdb
@@ -52,6 +54,8 @@ input SiteServiceImage_Filter {
   applicationEnvironmentDescription: FilterStringOperators
   # GLUE2ApplicationEnvironmentComputingManagerForeignKey
   applicationEnvironmentComputingManagerForeignKey: FilterStringOperators
+  # ImageBaseMpUri@appdb
+  imageBaseMpUri: FilterStringOperators
   # ImageContentType@appdb
   imageContentType: SiteServiceImageContentType
   # ImageVoVmiInstanceId@appdb
