@@ -13,7 +13,9 @@ export const TEMPLATE_SITE_SERVICE_ITEM_FIELDS = `
 id
 endpointPKey
 isInProduction
+beta
 gocPortalUrl
+endpointServiceType
 endpointURL
 endpointID
 endpointInterfaceName

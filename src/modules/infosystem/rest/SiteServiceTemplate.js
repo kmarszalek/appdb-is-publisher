@@ -13,8 +13,10 @@ export const TEMPLATE_SITE_SERVICE_TEMPLATE_COLLECTION_FIELDS = `
 id
 entityName
 resourceID
+resourceManager
 executionEnvironmentMainMemorySize
 executionEnvironmentPhysicalCPUs
+executionEnvironmentLogicalCPUs
 executionEnvironmentCPUMultiplicity
 executionEnvironmentOSFamily
 executionEnvironmentConnectivityIn
@@ -32,8 +34,10 @@ export const TEMPLATE_SITE_SERVICE_TEMPLATE_DETAILS_FIELDS =`
 id
 entityName
 resourceID
+resourceManager
 executionEnvironmentMainMemorySize
 executionEnvironmentPhysicalCPUs
+executionEnvironmentLogicalCPUs
 executionEnvironmentCPUMultiplicity
 executionEnvironmentOSFamily
 executionEnvironmentConnectivityIn

@@ -26,6 +26,7 @@ applicationEnvironmentAppName
 applicationEnvironmentAppVersion
 applicationEnvironmentDescription
 applicationEnvironmentComputingManagerForeignKey
+imageBaseMpUri
 imageContentType
 imageVoVmiInstanceId
 imageVmiInstanceId
