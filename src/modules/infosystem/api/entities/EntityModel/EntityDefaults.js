@@ -10,10 +10,52 @@ export const DEFAULT_ARRAY_OPERATOR_MAP = {
   "all": "$all",            // Array	Matches an array value if it contains all the elements of the argument array.
   "and": "$and",            // Array	Matches if all the selectors in the array match.
   "or": "$or",               // Array	Matches if any of the selectors in the array match. All selectors must use the same index.
+  "containsSome": (v) => {
+    let res = {"$elemMatch": {"$or": []}};
+    res.$elemMatch.$or = v.map(val => {
+      if (_.isString(val) && val.indexOf('*') > -1) {
+        return {$regex: toPCREString(val)};
+      }
+      return {$eq: val};
+    });
+
+    return res;
+  },
+  "icontainsSome": (v) => {
+    let res = {"$elemMatch": {"$or": []}};
+    res.$elemMatch.$or = v.map(val => {
+      if (_.isString(val)) {
+        return {$regex: "(?i)" + toPCREString(val)};
+      }
+      return {$eq: val};
+    });
+
+    return res;
+  },
+  "containsAll": (v, filter) => {
+    let res = {$and: []};
+    res.$and = v.map(val => {
+      if (_.isString(val) && val.indexOf('*') > -1) {
+        return {"$elemMatch": {$regex: toPCREString(val)}};
+      }
+      return {"$elemMatch": {"$eq": val}};
+    });
+
+    return res;
+  },
+  "icontainsAll": (v) => {
+    let res = {"$and": []};
+    res.$and = v.map(val => {
+      if (_.isString(val)) {
+        return {"$elemMatch" :{$regex: "(?i)" + toPCREString(val)}};
+      }
+      return {"$elemMatch": {$eq: val}};
+    });
+
+    return res;
+  },
   "oneOf": (v) => {
     let res = {$or: []};
-    v = v || [];
-    v = Array.isArray(v) ? v : [v];
     res.$or = v.map((val) => {
       if (_.isString(val) && val.indexOf('*') > -1) {
         return {"$regex": toPCREString(val)};
@@ -23,7 +65,7 @@ export const DEFAULT_ARRAY_OPERATOR_MAP = {
     });
     return res;
   },
-  "between": (v) => {console.log(v);
+  "between": (v) => {
     let max = Math.max(...v);
     let min = Math.min(...v);
 
@@ -39,6 +81,26 @@ export const DEFAULT_ARRAY_OPERATOR_MAP = {
     return {
       "$gte": min,
       "$lte": max
+    };
+  },
+  "containsBetween": (v) => {
+    let max = Math.max(...v);
+    let min = Math.min(...v);
+
+    if (max === min) {
+      if (max > 0) {
+        min = 0;
+      } else if (max < 0) {
+        min = max;
+        max = 0;
+      }
+    }
+
+    return {
+      "$elemMatch": {
+        "$gte": min,
+        "$lte": max
+      }
     };
   }
 };

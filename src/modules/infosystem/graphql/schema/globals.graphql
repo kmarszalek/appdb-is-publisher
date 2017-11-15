@@ -80,6 +80,14 @@ input FilterStringArrayOperators {
   contains: String
   # Array contains given string value (case insensitive)
   icontains: String
+  # Array contains some (one or more) of the given string values
+  containsSome: [String]
+  # Array contains some (one or more) of the given string values (case insensitive)
+  icontainsSome: [String]
+  # Array must contain all of the given string values
+  containsAll: [String]
+  # Array must contain all of the given string values (case insensitive)
+  icontainsAll: [String]
   # Optional string array comparisons
   #or: [FilterStringArrayOperators]
   # Mandatory string array comparisons
@@ -90,6 +98,12 @@ input FilterStringArrayOperators {
 input FilterIntegerArrayOperators {
   # Array contains given integer value
   contains: Int
+  # Array contains some (one or more) of the given integer values
+  containsSome: [Int]
+  # Array must contain all of the given integer values
+  containsAll: [Int]
+  # Array must contain values within the given integer range. If more than two integers are given the minimum and maximum values will be used.
+  containsBetween: [Int]
   # Optional integer array comparison
   #or: [FilterIntegerArrayOperators]
   # Mandatory integer array comparison
@@ -100,6 +114,12 @@ input FilterIntegerArrayOperators {
 input FilterFloatArrayOperators {
   # Array contains given float value
   contains: Float
+  # Array contains some (one or more) of the given integer values
+  containsSome: [Float]
+   # Array must contain all of the given integer values
+  containsAll: [Float]
+  # Array must contain values within the given float range. If more than two floats are given the minimum and maximum values will be used.
+  containsBetween: [Float]
   # Optional float array comparison
   #or: [FilterFloatArrayOperators]
   # Mandatory float array comparison
