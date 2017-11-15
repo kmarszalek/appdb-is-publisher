@@ -2,11 +2,12 @@
   "apps" : [{
     "name" : "is-publisher",
     "script"      : "bin/dev",
-    "watch"       : false,
+    "watch"       : true,
     "instances"   : 1,
     "exec_mode"   : "cluster",
-    "env_production" : {
+    "env" : {
       "NODE_ENV": "development",
+      "UV_THREADPOOL_SIZE": 64,
       "NODE_TLS_REJECT_UNAUTHORIZED": "0"
     }
   }]
