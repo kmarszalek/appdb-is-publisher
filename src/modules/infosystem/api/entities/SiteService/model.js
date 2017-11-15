@@ -13,8 +13,11 @@ function SiteServiceModel(context) {
       'site.pkey'                                         : 'info.SitePKey',
       'endpointPKey'                                      : 'info.SiteEndpointPKey',
       'isInProduction'                                    : 'info.SiteEndpointInProduction',
+      'beta'                                              : 'info.SiteEndpointBeta',
       'gocPortalUrl'                                      : 'info.SiteEndpointGocPortalUrl',
-      'endpointURL'                                       : 'info.GLUE2EndpointURL',
+      //'endpointURL'                                       : 'info.GLUE2EndpointURL',
+      'endpointServiceType'                               : 'info.SiteEndpointServiceType',
+      'endpointUrl'                                       : 'info.SiteEndpointURL',
       'endpointID'                                        : 'info.GLUE2EndpointID',
       'endpointInterfaceName'                             : 'info.GLUE2EndpointInterfaceName',
       'endpointInterfaceVersion'                          : 'info.GLUE2EndpointInterfaceVersion',
@@ -39,7 +42,9 @@ function SiteServiceModel(context) {
       'computingManagerWorkingAreaTotal'                  : 'info.GLUE2ComputingManagerWorkingAreaTotal',
       'entityOtherInfo'                                   : 'info.GLUE2EntityOtherInfo',
       'imageList'                                         : 'info.images',
+      'numberOfImages'                                    : 'meta.num_images',
       'templateList'                                      : 'info.templates',
+      'numberOfTemplates'                                 : 'meta.num_templates',
       'hash'                                              : 'info.hash'
     },
     relationMap         : {

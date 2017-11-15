@@ -35,7 +35,7 @@ function SiteModel(context) {
       'services'        : {name: 'SiteService', relationType: 'hasMany', relationOn: {key: 'info.SitePKey', foreignKey:  'info.SitePKey'}},
       'images'          : {name: 'SiteServiceImage', relationType: 'hasMany', relationOn: {key: 'info.SitePKey', foreignKey: 'info.SitePKey'}},
       'templates'       : {name: 'SiteServiceTemplate', relationType: 'hasMany', relationOn: {key: 'info.SitePKey', foreignKey: 'info.SitePKey'}}
-    } 
+    }
   });
 }
 

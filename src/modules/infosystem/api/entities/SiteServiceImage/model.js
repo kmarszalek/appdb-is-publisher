@@ -19,6 +19,7 @@ function SiteServiceImageModel(context) {
       'applicationEnvironmentAppVersion'                  : 'info.GLUE2ApplicationEnvironmentAppVersion',
       'applicationEnvironmentDescription'                 : 'info.GLUE2ApplicationEnvironmentDescription',
       'applicationEnvironmentComputingManagerForeignKey'  : 'info.GLUE2ApplicationEnvironmentComputingManagerForeignKey',
+      'imageBaseMpUri'                                    : 'info.ImageBaseMpUri',
       'imageContentType'                                  : 'info.ImageContentType',
       'imageVoVmiInstanceId'                              : 'info.ImageVoVmiInstanceId',
       'imageVmiInstanceId'                                : 'info.ImageVmiInstanceId',
