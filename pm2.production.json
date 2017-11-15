@@ -3,7 +3,7 @@
     "name" : "is-publisher",
     "script"      : "bin/production",
     "watch"       : false,
-    "instances"   : 4,
+    "instances"   : 2,
     "exec_mode"   : "cluster",
     "env_production" : {
       "NODE_ENV": "production",
