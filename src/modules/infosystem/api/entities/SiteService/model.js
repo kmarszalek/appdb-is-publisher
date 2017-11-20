@@ -48,7 +48,7 @@ function SiteServiceModel(context) {
       'hash'                                              : 'info.hash'
     },
     relationMap         : {
-      'site'            : {name: 'Site', relationType: 'belongsTo', relationOn: {key: 'info.SitePKey', foreignKey: 'info.SitePKey'}},
+      'site'            : {name: 'Site', relationType: 'belongsTo', relationOn: {key: 'info.SitePKey', foreignKey: 'info.SitePKey'}, sharedFields: {'name': 'site.name', 'pkey': 'site.pkey'} },
       'images'          : {name: 'SiteServiceImage', relationType: 'hasMany', relationOn: {key: 'info.SiteEndpointPKey', foreignKey: 'info.SiteEndpointPKey'}},
       'templates'       : {name: 'SiteServiceTemplate', relationType: 'hasMany', relationOn: {key: 'info.SiteEndpointPKey',foreignKey: 'info.SiteEndpointPKey'}}
     },
