@@ -100,10 +100,28 @@ function _createExecutionEngine({modelName, dbConnection, mapper}) {
 
     if (rootData !== null) {
       let mapResults = map.results || [];
-      let mappedData = mapResults.map(d => {
-        return {[map.relations.key]: _.get(d, map.relations.foreignKey)};
-      });
-      return _.intersectionBy(rootData, mappedData, map.relations.key);
+      let mappedData = [];
+      let mapPKey = _.get(map, 'relations.key');
+      let mapFKey = _.get(map, 'relations.foreignKey');
+
+      if (map.relationType === 'belongsTo') {
+        mappedData = mapResults.map(d => {
+          return _.get(d, mapFKey);
+        });
+
+        return rootData.reduce((acc, val) => {
+          if ( mappedData.indexOf(_.get(val, mapFKey)) > -1 ) {
+            acc.push(val);
+          }
+          return acc;
+        }, []);
+
+      } else {
+        mappedData = mapResults.map(d => {
+          return {[mapPKey]: _.get(d, mapFKey)};
+        });
+        return _.intersectionBy(rootData, mappedData, map.relations.key);
+      }
     }
 
     return rootData;

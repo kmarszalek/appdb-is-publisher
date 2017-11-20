@@ -47,14 +47,16 @@ function _createExecutionPlanner({modelName, mapper}) {
     operationType = EXECUTION_PLAN_OPERATION_TYPE.NONE,
     operateOn = EXECUTION_PLAN_OPERATE_ON.NONE,
     query = {},
-    relations = null
+    relations = null,
+    relationType = null
   } = {
     name: modelName,
     stepType: EXECUTION_PLAN_STEP_TYPE.INIT,
     operationType: EXECUTION_PLAN_OPERATION_TYPE.NONE,
     operateOn: EXECUTION_PLAN_OPERATE_ON.NONE,
     query: {},
-    relations:  null
+    relations:  null,
+    relationType: null
   }) => {
 
     let descr = {
@@ -67,6 +69,7 @@ function _createExecutionPlanner({modelName, mapper}) {
 
     if (relations) {
       descr.relations = relations;
+      descr.relationType = relationType
     }
 
     return descr;
@@ -105,6 +108,7 @@ function _createExecutionPlanner({modelName, mapper}) {
         operationType: EXECUTION_PLAN_OPERATION_TYPE.NONE,
         operateOn: EXECUTION_PLAN_OPERATE_ON.ROOT,
         relations: rmap.relationOn || {},
+        relationType: rmap.relationType,
         query: {filter: val, fields: fields}
       });
 
