@@ -14,17 +14,83 @@ import {
 } from './ExecutionPlanEnums';
 import EntityModelRegistry from './EntityModelRegistry';
 
+function getNormalizedRelationMap(mapper) {
+  let res = {};
+
+  if (mapper && mapper.getRelationMap) {
+    res = mapper.getRelationMap();
+    res = Object.keys(res).reduce((acc, key) => {
+      acc[key] = acc[key] || {};
+      acc[key].relationType = acc[key].relationType || 'none';
+      acc[key].relationOn = acc[key].relationOn || {};
+      acc[key].sharedFields = acc[key].sharedFields || {};
+      acc[key].hasSharedFields = (Object.keys(acc[key].sharedFields).length > 0)
+      return acc;
+    }, res);
+  }
+
+  return res;
+}
 
 function _createExecutionPlanner({modelName, mapper}) {
-  const relationMap = mapper.getRelationMap();
+  const relationMap = getNormalizedRelationMap(mapper);//.getRelationMap();
   const _relationKeys = _.keys(relationMap);
 
   const _needsPlanning = (filter) => {
     return _seperateFilterRelations(filter).hasExternal;
   };
 
+  const _optimizeSharedFields = (res) => {
+    // OPTIMIZATION: Add filtering to root entity for shared fields
+    // and remove them from extrnal entity filtering.
+    // If no external filtering is left, remove it all together.
+    // eg. In a siteservice filtetin the site.name does not need to be filtered
+    // as an external site entity since this information is already contained
+    // in the siteservice itself.
+    if (res.hasExternal === true) {
+      res.external = _.reduce(res.external, (acc, filterVal, filterKey) => {
+        let rel = relationMap[filterKey] || {};
+        if ( rel.hasSharedFields && _.isPlainObject(filterVal) ) {
+          let newFilterObj = Object.keys(filterVal).reduce((o, key, index) => {
+            if (_.has(rel.sharedFields, key)) {
+              let newKey = _.get(rel.sharedFields, key);
+              let tmp = _.set({}, newKey, filterVal[key]);
+              o = _.merge(o, tmp);
+              delete filterVal[key];
+            }
+
+            return o
+          }, {});
+
+          if (Object.keys(newFilterObj).length > 0) {
+            res.internal = res.internal || {};
+            res.internal = _.merge(res.internal, newFilterObj);
+          }
+
+          if (Object.keys(filterVal).length === 0) {
+            delete acc[filterKey];
+          } else {
+            acc[filterKey] = filterVal;
+          }
+        }
+
+        return acc;
+      }, res.external);
+
+      if (Object.keys(res.external).length === 0) {
+        res.hasExternal = false;
+      }
+
+      if (res.hasInternal === false && Object.keys(res.internal || {}).length > 0) {
+        res.hasInternal = true;
+      }
+    }
+
+    return res;
+  };
+
   const _seperateFilterRelations = (filter) => {
-    return _.reduce(filter, (acc, filterVal, filterKey) => {
+    let res =  _.reduce(filter, (acc, filterVal, filterKey) => {
       if (_relationKeys.indexOf(filterKey) > -1) {
         acc.external = _.merge(acc.external, {[filterKey]: filterVal});
         acc.hasExternal = true;
@@ -32,13 +98,17 @@ function _createExecutionPlanner({modelName, mapper}) {
         acc.internal = _.merge(acc.internal, {[filterKey]: filterVal});
         acc.hasInternal = true;
       }
-      return acc;useId
+      return acc;
     }, {
       external: {},
       internal: {},
       hasExternal: false,
       hasInternal: false
     });
+
+    res = _optimizeSharedFields(res);
+
+    return res;
   }
 
   const _createQueryDescription = ({
