@@ -72,7 +72,9 @@ function _createExecutionEngine({modelName, dbConnection, mapper}) {
   function prepareStepMap(map, initialData) {
     let q = {};
     if (initialData !== null) {
-      q[map.relations.foreignKey] = {$in: _.map(initialData, (v) => _.get(v, map.relations.key))};
+      q[map.relations.foreignKey] = {$in: _.uniq(_.map(initialData, (v) => _.get(v, map.relations.key)))};
+      //OPTIMIZATION: Do not perform $in operation for single items
+      q[map.relations.foreignKey] = (q[map.relations.foreignKey].$in.length === 1) ? {$eq: q[map.relations.foreignKey].$in[0]} : q[map.relations.foreignKey];
     }
     map.query.translateProperties = false;
     map.query.wrapItemsToCollection = false;
@@ -203,7 +205,7 @@ function _createExecutionEngine({modelName, dbConnection, mapper}) {
       let rootIds = reducedData.map(d => d._id);
       let rootRequest = Object.assign({}, plan.initialRequest || {});
 
-      rootRequest.filter = {_id: {$in: rootIds}};
+      rootRequest.filter = (rootIds.length === 1) ? {_id: {$eq: rootIds[0]}} : {_id: {$in: rootIds}};
       rootRequest.wrapItemsToCollection = false;
       rootRequest.translateProperties = true;
       rootRequest.fields = plan.initialRequest.fields;
