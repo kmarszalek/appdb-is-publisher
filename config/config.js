@@ -24,7 +24,7 @@ var config = {
           "options" :{
             "name": "_default",
             "url": "https://nouser:nouser@localhost:6984",
-            "collection": "testdb"
+            "collection": "isappdb"
           },
           "logger": {
             "info": "/var/log/is-publisher/dbaccess/info.log",
