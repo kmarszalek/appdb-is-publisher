@@ -67,7 +67,7 @@ input SiteServiceImage_Filter {
   # hash@is
   hash: String
   site: Site_Filter
-  service: SiteServiceImage_Filter
+  service: SiteService_Filter
   templates: SiteServiceTemplate_Filter,
   #hasSiteServiceTemplates: Boolean
   #or: [SiteServiceImage_Filter]
