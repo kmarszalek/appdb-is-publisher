@@ -37,6 +37,8 @@ type SiteService {
   beta: Boolean
   # SiteEndpointGocPortalUrl@gocdb
   gocPortalUrl: String
+  # Site service endpoint url as provided by gocdb  (SiteEndpointUrl@goc)
+  gocEndpointUrl: String
   # Indicates the type of site service. Eg cloud computing etc (SiteEndpointServiceType@local)
   endpointServiceType: String
   # Network location of an endpoint,which enables a specific component of the Service to be contacted. (GLUE2EndpointURL@topBDII or SiteEndpointUrl@gocdb)
@@ -115,6 +117,8 @@ input SiteService_Filter {
   gocPortalUrl: FilterStringOperators
   # SiteEndpointServiceType@local
   endpointServiceType: FilterStringOperators
+  # SiteEndpointUrl@goc
+  gocEndpointUrl: FilterStringOperators
   # GLUE2EndpointURL
   endpointURL: FilterStringOperators
   # GLUE2EndpointID
