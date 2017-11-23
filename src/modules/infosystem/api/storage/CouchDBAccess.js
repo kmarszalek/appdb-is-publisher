@@ -4,6 +4,7 @@ import md5 from './../../../../lib/isql/utils/md5.js';
 import nano from 'nano';
 import _ from 'lodash';
 import http from 'http';
+import DataLoader from 'dataloader';
 http.globalAgent.maxSockets = 200;
 
 const _DEFAULT_LIMIT_VALUE = 1000;
@@ -71,6 +72,7 @@ function logger(title, message, context, results) {
   let prefix = '\x1b[32m[GraphQL' + md5 +']\x1b[0m';
   console.log(prefix + '\x1b[34m[CouchDBAccess::' + title + ']' + results + '\x1b[0m: ' + message);
 }
+
 function errorLogger(title, message, context) {
   let md5 = _.get(context, 'request.md5Hash', '');
   md5 = (md5) ? '::' + md5 : '';
@@ -82,13 +84,31 @@ class CouchDBAccess {
     this._db  = db;
   }
 
-  findOne(args, context) {
+  _cacheDb(context) {
+    let _db = this;
+    if (!context.filterLoader) {
+      context.filterLoader = {
+        findOne: new DataLoader(queries => Promise.all(queries.map(q => _db._findOne(JSON.parse(q), context)))),
+        findMany: new DataLoader(queries => Promise.all(queries.map(q => _db._findMany(JSON.parse(q), context)))),
+        findCount: new DataLoader(queries => Promise.all(queries.map(q => _db._findCount(JSON.parse(q), context)))),
+        getById: new DataLoader(ids => Promise.all(ids.map(id => _db._getById(id, context))))
+      };
+    }
+
+    return {
+      findOne: (query) => context.filterLoader.findOne.load(JSON.stringify(query)),
+      findMany: (query) => context.filterLoader.findMany.load(JSON.stringify(query)),
+      findCount: (query) => context.filterLoader.findCount.load(JSON.stringify(query)),
+      getById: (id) => context.filterLoader.getById.load(id)
+    }
+  }
+
+  _findOne(args, context) {
     let query = normalizeListArgs(args);
     if (_.trim(_.get(args, 'id', null))) {
       return this._db.get(args.id);
     }
 
-    //logger('findOne', JSON.stringify(args), context);
     return this._db.findAsync(query).then(result => {
       let docs = result.docs || [];
       docs = Array.isArray(docs) ? docs : [docs];
@@ -103,11 +123,17 @@ class CouchDBAccess {
     });
   }
 
-  findCount(args, context) {
+  findOne(args, context) {
+    return this._cacheDb(context).findOne(args);
+  }
+
+  _findCount(args, context) {
     let query = normalizeListArgs(args);
+
     query.limit = _MAX_LIMIT_VALUE;
     query.skip = 0;
     query.fields = ['_id'];
+
     return this._db.findAsync(query).then(result => {
       let docs = result.docs || [];
       docs = Array.isArray(docs) ? docs : [docs];
@@ -122,9 +148,13 @@ class CouchDBAccess {
     });
   }
 
-  findMany(args, context) {
+  findCount(args, context) {
+    return this._cacheDb(context).findCount(args);
+  }
+
+  _findMany(args, context) {
     let query = normalizeListArgs(args);
-    //logger('findMany', JSON.stringify(args), context);
+
     return this._db.findAsync(query).then(result => {
       logger('findMany', JSON.stringify(args), context, _.trim(result.docs.length));
       let docs = result.docs || [];
@@ -136,10 +166,14 @@ class CouchDBAccess {
       errorLogger('findMany', Object.toString(err), context);
       _.set(context, 'request.statistics.totalDBRequests', _.get(context, 'request.statistics.totalDBRequests', 0) + 1);
       return Promise.reject(err);
-    })
+    });
   }
 
-  getIds(args, useIdField = '_id') {
+  findMany(args, context) {
+    return this._cacheDb(context).findMany(args);
+  }
+
+  getIds(args, context, useIdField = '_id') {
     let query = normalizeListArgs(args);
 
     query.fields = [useIdField];
@@ -161,7 +195,7 @@ class CouchDBAccess {
     });
   }
 
-  getById(id, context) {
+  _getById(id, context) {
     return this._db.getAsync(id).catch(err => {
         switch(err.message) {
           case 'missing':
@@ -169,6 +203,10 @@ class CouchDBAccess {
         }
         return Promise.reject(err);
     });
+  }
+
+  getById(id, context) {
+    return this._cacheDb(context).getById(id);
   }
 }
 
