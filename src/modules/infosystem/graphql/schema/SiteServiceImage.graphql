@@ -30,6 +30,8 @@ type SiteServiceImage {
   imageVmiInstanceId: Int
   # ImageVmiInstanceId@appdb
   imageVoVmiInstanceVO: String
+  # ImageAppDBVAppID@appdb
+  imageAppDBVAppID: Int
   # hash@is
   hash: String
   site: Site
@@ -39,7 +41,7 @@ type SiteServiceImage {
 
 input SiteServiceImage_Filter {
   # Local Information System identifier
-  id: ID
+  id: FilterStringOperators
   # GLUE2EntityName
   entityName: FilterStringOperators
   # GLUE2ApplicationEnvironmentID
@@ -58,12 +60,14 @@ input SiteServiceImage_Filter {
   imageBaseMpUri: FilterStringOperators
   # ImageContentType@appdb
   imageContentType: SiteServiceImageContentType
-  # ImageVoVmiInstanceId@appdb
-  imageVoVmiInstanceId: Int
-  # ImageVmiInstanceId@appdb
-  imageVmiInstanceId: Int
-  # ImageVmiInstanceId@appdb
-  imageVoVmiInstanceVO: String
+  # AppDB Virtual Machine Image ID reference in VO image list (ImageVoVmiInstanceId@appdb)
+  imageVoVmiInstanceId: FilterIntegerOperators
+  # AppDB Virtual Machine Image ID (ImageVmiInstanceId@appdb)
+  imageVmiInstanceId: FilterIntegerOperators
+  # VO supporting this AppDB Virtual Machine Image instance (imageVoVmiInstanceVO@appdb)
+  imageVoVmiInstanceVO: FilterStringOperators
+  # AppDB Virtual Appliance ID (ImageAppDBVAppID@appdb)
+  imageAppDBVAppID: FilterIntegerOperators
   # hash@is
   hash: String
   site: Site_Filter

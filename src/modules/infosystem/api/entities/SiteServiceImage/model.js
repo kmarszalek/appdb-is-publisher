@@ -24,6 +24,7 @@ function SiteServiceImageModel(context) {
       'imageVoVmiInstanceId'                              : 'info.ImageVoVmiInstanceId',
       'imageVmiInstanceId'                                : 'info.ImageVmiInstanceId',
       'imageVoVmiInstanceVO'                              : 'info.ImageVoVmiInstanceVO',
+      'imageAppDBVAppID'                                  : 'info.ImageAppDBVAppID',
       'hash'                                              : 'info.hash'
     },
     relationMap         : {
