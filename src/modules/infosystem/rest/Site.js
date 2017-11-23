@@ -55,13 +55,13 @@ export const getCallerByIdentifier = (id, onlyQuery = false) => {
   } else if (id.indexOf('name:') === 0) {
     id = id.replace('name:', '');
     if (onlyQuery) {
-      return `name: "${id}"`;
+      return `name: {eq: "${id}"}`;
     }else {
       return `siteByName(name: "${id}")`;
     }
   } else {
     if (onlyQuery) {
-      return `id: "${id}"`;
+      return `id: {eq: "${id}"}`;
     }else {
       return `siteById(id: "${id}")`;
     }

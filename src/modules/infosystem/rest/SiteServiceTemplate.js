@@ -66,7 +66,7 @@ service {
 
 export const getCallerByIdentifier = (id, onlyQuery = false) => {
   if (onlyQuery) {
-    return `id: "${id}"`;
+    return `id: {eq: "${id}"}`;
   }else {
     return `siteServiceTemplateById(id: "${id}")`;
   }
