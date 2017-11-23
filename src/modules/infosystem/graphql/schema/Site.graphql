@@ -69,9 +69,9 @@ type Site {
 # Site filtering options to help query the site collection
 input Site_Filter {
   # Local Information System Identifier
-  id: ID
+  id: FilterStringOperators
   # GocDB Site identifier (SitePKey@gocdb)
-  pkey: String
+  pkey: FilterStringOperators
   # Site name (SiteName@gocdb)
   name: FilterStringOperators
   # Short version of site name (SiteShortName@gocdb)

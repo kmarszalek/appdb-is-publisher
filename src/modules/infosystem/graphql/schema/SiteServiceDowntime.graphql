@@ -29,7 +29,7 @@ type SiteServiceDowntime {
 }
 
 input SiteServiceDowntime_Filter {
-  id: ID
+  id: FilterStringOperators
   downtimePKey: FilterStringOperators
   classification: SiteServiceDowntimeClassification
   severity: SiteServiceDowntimeSeverity

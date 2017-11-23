@@ -106,7 +106,7 @@ type SiteService {
 
 input SiteService_Filter {
   # Local Information System Identifier
-  id: ID
+  id: FilterStringOperators
   # SiteEndpointPKey@gocdb
   endpointPKey: FilterStringOperators
   # SiteEndpointInProduction@gocdb
@@ -150,7 +150,7 @@ input SiteService_Filter {
   # GLUE2EndpointServiceForeignKey
   endpointServiceForeignKey: FilterStringOperators
   # GLUE2ManagerID
-  managerID: String
+  managerID: FilterStringOperators
   # GLUE2ManagerProductName
   managerProductName: FilterStringOperators
   # GLUE2ManagerProductVersion

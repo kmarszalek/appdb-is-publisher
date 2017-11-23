@@ -46,7 +46,7 @@ type SiteServiceTemplate {
 
 input SiteServiceTemplate_Filter {
   # Local Information System Identifier
-  id: String
+  id: FilterStringOperators
   # GLUE2EntityName
   entityName: FilterStringOperators
   # GLUE2ResourceID

@@ -19,7 +19,7 @@ type SiteServiceStatus {
 }
 
 input SiteServiceStatus_Filter {
-  id: ID
+  id: FilterStringOperators
   type: SiteServiceStatusType
   endpointGroup: FilterStringOperators
   value: SiteServiceStatusValue
