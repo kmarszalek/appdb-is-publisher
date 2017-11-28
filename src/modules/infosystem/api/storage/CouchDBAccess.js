@@ -5,6 +5,7 @@ import nano from 'nano';
 import _ from 'lodash';
 import http from 'http';
 import DataLoader from 'dataloader';
+import UniqueTaskRegistry from './../../../../lib/isql/utils/UniqueTaskRegistry';
 http.globalAgent.maxSockets = 200;
 
 const _DEFAULT_LIMIT_VALUE = 1000;
@@ -80,8 +81,17 @@ function errorLogger(title, message, context) {
 }
 
 class CouchDBAccess {
-  constructor(db) {
+  constructor(db, name) {
     this._db  = db;
+    this._name = name;
+    this._taskRegistry = new UniqueTaskRegistry(this._name, {cacheResponseTime: 10000});
+  }
+
+  queryTask(name, query) {
+    var func =this._db[name];
+    var id = this._name + '::' + name + '(' + (_.isPlainObject(query) ? JSON.stringify(query) : query) + ')';
+
+    return this._taskRegistry.register(id, function __queryTaskCaller__() { return func(query); });
   }
 
   _cacheDb(context) {
@@ -106,10 +116,10 @@ class CouchDBAccess {
   _findOne(args, context) {
     let query = normalizeListArgs(args);
     if (_.trim(_.get(args, 'id', null))) {
-      return this._db.get(args.id);
+      return this.queryTask('get', args.id);
     }
 
-    return this._db.findAsync(query).then(result => {
+    return this.queryTask('findAsync', query).then(result => {
       let docs = result.docs || [];
       docs = Array.isArray(docs) ? docs : [docs];
       logger('findOne', JSON.stringify(args), context, (docs.length > 0));
@@ -134,7 +144,7 @@ class CouchDBAccess {
     query.skip = 0;
     query.fields = ['_id'];
 
-    return this._db.findAsync(query).then(result => {
+    return this.queryTask('findAsync',query).then(result => {
       let docs = result.docs || [];
       docs = Array.isArray(docs) ? docs : [docs];
       logger('findCount', JSON.stringify(args), context, docs.length);
@@ -155,7 +165,7 @@ class CouchDBAccess {
   _findMany(args, context) {
     let query = normalizeListArgs(args);
 
-    return this._db.findAsync(query).then(result => {
+    return this.queryTask('findAsync', query).then(result => {
       logger('findMany', JSON.stringify(args), context, _.trim(result.docs.length));
       let docs = result.docs || [];
       docs = Array.isArray(docs) ? docs : [docs];
@@ -181,7 +191,7 @@ class CouchDBAccess {
     delete query.skip;
     delete query.sort;
 
-    return this._db.findAsync(query).then(result => {
+    return this.queryTask('findAsync', query).then(result => {
       logger('getIds', JSON.stringify(args), _.trim(results.docs.length));
       let docs = result.docs || [];
       docs = Array.isArray(docs) ? docs : [docs];
@@ -196,7 +206,7 @@ class CouchDBAccess {
   }
 
   _getById(id, context) {
-    return this._db.getAsync(id).catch(err => {
+    return this.queryTask('getAsync', id).catch(err => {
         switch(err.message) {
           case 'missing':
             return Promise.resolve({data: null});
