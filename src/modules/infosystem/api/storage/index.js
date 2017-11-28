@@ -3,14 +3,20 @@ import md5 from './../../../../lib/isql/utils/md5';
 import CouchDBAccess from './CouchDBAccess';
 import nano from 'nano';
 import Promise from 'bluebird';
+var http = require('http');
+var https = require('https');
+http.globalAgent.maxSockets = 300;
+https.globalAgent.maxSockets = 300;
 
 const _connections = {};
 
 function _initStorage({name, url = mandatoryFunctionParameter('url', 'CouchDBAccess::constructor'), username = '', password = '', collection = mandatoryFunctionParameter('collection', 'CouchDBAccess::constructor') }) {
   name = name  || md5(url, username, password, collection);
 
-  let connection = Promise.promisifyAll(nano(url).use(collection));
-  let db = new CouchDBAccess(connection);
+  let nanoConnection = nano({url, "requestDefaults" : { "agent" : false }});
+  let nanoCollection = nanoConnection.use(collection);
+  let connection = Promise.promisifyAll(nanoCollection);
+  let db = new CouchDBAccess(connection, name);
 
   return Promise.resolve(db).then((db) => {
     if (name in _connections) {
