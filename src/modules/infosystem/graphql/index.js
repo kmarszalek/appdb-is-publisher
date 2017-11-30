@@ -18,8 +18,8 @@ export const serviceDescription = {
   '/graphql': {
     description: 'Service providing a GraphQL endpoint to query the information system backend.'
   },
-  '/graphiql': {
-    description: 'Service providing a UI tool to post queries to the underlining GraphQL endpoint.'
+  '/tools/graphiql': {
+    description: 'Service providing a UI tool to post queries to the local GraphQL endpoint.'
   }
 };
 

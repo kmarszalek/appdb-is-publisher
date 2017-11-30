@@ -1,4 +1,5 @@
 import express from 'express';
+import url from 'url';
 import Configuration from './lib/isql/Configuration';
 import bodyParser from 'body-parser';
 import { graphqlExpress, graphiqlExpress } from 'apollo-server-express';
@@ -96,7 +97,13 @@ function _initServer(conf) {
     })
   );
 
-  app.use('/graphiql', graphiqlExpress({endpointURL: '/graphql', pretty: true }));
+  app.use('/tools/graphiql',graphiqlExpress({endpointURL: '/graphql', pretty: true }));
+  app.use('/graphiql', (req, res) => res.redirect(
+    url.format({
+      pathname: '/tools/graphiql',
+      query: req.query
+    })
+  ));
   app.use('/rest', restRouter(express.Router(), Configuration.getModuleConfiguration('infosystem.rest')));
   app.use('/couchdb', proxyRouter(express.Router(), Configuration.getModuleConfiguration('couchDBProxy'), 'couchdb'));
   app.use('*', miscRoutes(express.Router()));
