@@ -20,6 +20,9 @@ export const serviceDescription = {
   },
   '/tools/graphiql': {
     description: 'Service providing a UI tool to post queries to the local GraphQL endpoint.'
+  },
+  '/tools/voyager': {
+    description: 'Service providing a UI tool to visually explore the local GraphQL schema as an interactive graph. [experimental]'
   }
 };
 

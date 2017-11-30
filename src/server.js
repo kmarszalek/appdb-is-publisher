@@ -3,6 +3,7 @@ import url from 'url';
 import Configuration from './lib/isql/Configuration';
 import bodyParser from 'body-parser';
 import { graphqlExpress, graphiqlExpress } from 'apollo-server-express';
+import { express as voyagerExpress } from 'graphql-voyager/middleware';
 import DataLoader from 'dataloader';
 import {serviceDescription as graphqlServiceDescription} from './modules/infosystem/graphql';
 import {expressRouter as restRouter, handleNoImlementation, handleUnknown, serviceDescription as restServiceDescription} from './modules/infosystem/rest';
@@ -98,6 +99,7 @@ function _initServer(conf) {
   );
 
   app.use('/tools/graphiql',graphiqlExpress({endpointURL: '/graphql', pretty: true }));
+  app.use('/tools/voyager', voyagerExpress({ endpointUrl: '/graphql', displayOptions: {sortByAlphabet: true} }));
   app.use('/graphiql', (req, res) => res.redirect(
     url.format({
       pathname: '/tools/graphiql',
