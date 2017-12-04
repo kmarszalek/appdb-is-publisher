@@ -115,11 +115,17 @@ class CouchDBAccess {
 
   _findOne(args, context) {
     let query = normalizeListArgs(args);
+    let queryTask = null;
+
+    //Optimization: Do not perform query if 'id' field is given
+    //Instead just retrieve document by ID.
     if (_.trim(_.get(args, 'id', null))) {
-      return this.queryTask('get', args.id);
+      queryTask = this.queryTask('get', args.id);
+    } else {
+      queryTask = this.queryTask('findAsync', query);
     }
 
-    return this.queryTask('findAsync', query).then(result => {
+    return queryTask.then(result => {
       let docs = result.docs || [];
       docs = Array.isArray(docs) ? docs : [docs];
       logger('findOne', JSON.stringify(args), context, (docs.length > 0));
