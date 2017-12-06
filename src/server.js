@@ -8,7 +8,10 @@ import DataLoader from 'dataloader';
 import {serviceDescription as graphqlServiceDescription} from './modules/infosystem/graphql';
 import {expressRouter as restRouter, handleNoImlementation, handleUnknown, serviceDescription as restServiceDescription} from './modules/infosystem/rest';
 import {expressRouter as proxyRouter} from './modules/couchDBProxy';
-
+import http from 'http';
+import https from 'https';
+http.globalAgent.maxSockets = 2000;
+https.globalAgent.maxSockets = 2000;
 const PORT = Configuration.getServerConfiguration('http.port', 80);
 
 function createDataLoaders(api) {

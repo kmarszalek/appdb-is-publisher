@@ -3,10 +3,8 @@ import mandatoryFunctionParameter from './../../../../lib/isql/utils/mandatoryFu
 import md5 from './../../../../lib/isql/utils/md5.js';
 import nano from 'nano';
 import _ from 'lodash';
-import http from 'http';
 import DataLoader from 'dataloader';
 import UniqueTaskRegistry from './../../../../lib/isql/utils/UniqueTaskRegistry';
-http.globalAgent.maxSockets = 200;
 
 const _DEFAULT_LIMIT_VALUE = 1000;
 
