@@ -44,7 +44,7 @@ class UniqueTask {
       try {
         let res = taskCaller();
         if (res && _.isFunction(res.then) && _.isFunction(res.catch)) {
-          res.then(resolve);
+          res.then(resolve).catch(reject);
         } else {
           resolve(res);
         }
