@@ -21,9 +21,9 @@ input FilterStringOperators {
   # If '*' wildcard is used in a text element it will act as 'like' operator.
   oneOf: [String]
   # Optional String comparisons
-  or: [FilterStringOperators]
+  #or: [FilterStringOperators]
   # Mandatory String comparisons
-  and: [FilterStringOperators]
+  #and: [FilterStringOperators]
 }
 
 # Filter for integer comparisons
@@ -116,7 +116,7 @@ input FilterFloatArrayOperators {
   contains: Float
   # Array contains some (one or more) of the given integer values
   containsSome: [Float]
-   # Array must contain all of the given integer values
+  # Array must contain all of the given integer values
   containsAll: [Float]
   # Array must contain values within the given float range. If more than two floats are given the minimum and maximum values will be used.
   containsBetween: [Float]
