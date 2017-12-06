@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import {query, TEMPLATE_COLLECTION_HEADER} from './restModel';
-import {filterToGraphQL, resultHandlerByPath} from './utils';
+import {filterToGraphQL, asyncFilterToGraphQL, resultHandlerByPath} from './utils';
 import gql from 'graphql-tag';
 import {TEMPLATE_SITE_ITEM_FIELDS, TEMPLATE_SITE_DETAILS_FIELDS} from './Site';
 import {TEMPLATE_SITE_SERVICE_COLLECTION_FIELDS, TEMPLATE_SITE_SERVICE_DETAILS_FIELDS} from './SiteService';
@@ -89,22 +89,23 @@ export const getSiteServiceImage = (templateId, imageId) => {
 };
 
 export const getAllSiteServiceImages = (templateId, {filter = {}, limit = 0, skip = 0} = {filter:{}, limit: 0, skip: 0}) => {
-  let caller = getCallerByIdentifier(templateId);
-  let imagesFlt = filterToGraphQL(filter);
-  let imagesQuery = `
-    images(filter: ${imagesFlt}, limit: ${limit}, skip: ${skip}) {
-      ${TEMPLATE_COLLECTION_HEADER}
-      items {
-      ${TEMPLATE_SITE_SERVICE_IMAGE_COLLECTION_FIELDS}
+  return asyncFilterToGraphQL(filter).then(imagesFlt => {
+    let caller = getCallerByIdentifier(templateId);
+    let imagesQuery = `
+      images(filter: ${imagesFlt}, limit: ${limit}, skip: ${skip}) {
+        ${TEMPLATE_COLLECTION_HEADER}
+        items {
+        ${TEMPLATE_SITE_SERVICE_IMAGE_COLLECTION_FIELDS}
+        }
       }
-    }
-  `;
-  return query(gql`{
-    data: ${caller} {
-      id
-      ${imagesQuery}
-    }
-  }`).then(resultHandlerByPath('data.images'));
+    `;
+    return query(gql`{
+      data: ${caller} {
+        id
+        ${imagesQuery}
+      }
+    }`).then(resultHandlerByPath('data.images'));
+  });
 };
 
 export const getSite = (templateId) => {
@@ -116,7 +117,7 @@ export const getSite = (templateId) => {
         ${TEMPLATE_SITE_DETAILS_FIELDS}
       }
     }
-  }`).then(resultHandlerByPath('data.site'));
+  }`).then(resultHandlerByPath('data.site as data'));
 };
 
 export const getSiteService = (templateId) => {
@@ -128,7 +129,7 @@ export const getSiteService = (templateId) => {
         ${TEMPLATE_SITE_SERVICE_DETAILS_FIELDS}
       }
     }
-  }`).then(resultHandlerByPath('data.service'));
+  }`).then(resultHandlerByPath('data.service as data'));
 };
 
 export const getByIdentifier = (id) => {
@@ -142,18 +143,18 @@ export const getByIdentifier = (id) => {
 };
 
 export const getAll =  ({filter = {}, limit = 0, skip = 0} = {filter:{}, limit: 0, skip: 0}) => {
-  let flt = filterToGraphQL(filter);
-
-  return query(gql`
-    {
-      data: siteServiceTemplates(filter: ${flt}, limit: ${limit}, skip: ${skip}) {
-        ${TEMPLATE_COLLECTION_HEADER}
-        items {
-        ${TEMPLATE_SITE_SERVICE_TEMPLATE_COLLECTION_FIELDS}
+  return asyncFilterToGraphQL(filter).then(flt => {
+    return query(gql`
+      {
+        data: siteServiceTemplates(filter: ${flt}, limit: ${limit}, skip: ${skip}) {
+          ${TEMPLATE_COLLECTION_HEADER}
+          items {
+          ${TEMPLATE_SITE_SERVICE_TEMPLATE_COLLECTION_FIELDS}
+          }
         }
       }
-    }
-  `);
+    `);
+  });
 };
 
 export default {
