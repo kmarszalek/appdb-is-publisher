@@ -17,16 +17,20 @@ const RequestMetaData = ({entityType = null, dataType = 'item', links = {}} = {e
 const CollectionMetaData = ({entityType, links}) => RequestMetaData({entityType, dataType: 'collection'});
 const ItemMetaData = ({entityType}) => RequestMetaData({entityType, dataType: 'item'});
 
-const applyMetaData = (doc, req) => {
-  doc = Object.assign(req.requestMetaData || {}, doc);
+const applyMetaData = (doc, req, ext) => {
+  ext = _.isPlainObject(ext) ? ext : {};
+  req.requestMetaData = req.requestMetaData || {};
+  doc = {...req.requestMetaData, ...ext, ...doc};
   return doc;
 };
 
-const _handleMissing = (req, res) => {
+const _handleMissing = (req, res) => {console.log(';HANDLING MISSING!!!!!1');
   res.setHeader('Content-Type', 'application/json');
   res.status(404);
   let doc = {
+    httpStatus: 404,
     error: {
+      type: 'NOT_FOUND',
       message: 'Not found',
       details: 'The requested resource does not exist.'
     }
@@ -39,7 +43,9 @@ export const handleUnknown = (req, res) => {
   res.setHeader('Content-Type', 'application/json');
   res.status(400);
   let doc = {
+    httpStatus: 400,
     error: {
+      type: 'BAD_REQUEST',
       message: 'Bad request',
       details: 'Invalid request. Please check the URL for errors.'
     }
@@ -52,7 +58,9 @@ export const handleNoImlementation = (req, res) => {
   res.setHeader('Content-Type', 'application/json');
   res.status(501);
   let doc = {
+    httpStatus: 501,
     error: {
+      type: "NOT_IMPLEMENTED",
       message: 'Not implemented',
       details: 'The requested facility is not implemented yet.'
     }
@@ -61,9 +69,93 @@ export const handleNoImlementation = (req, res) => {
   res.end();
 };
 
+const getInvalidFilterFromError = (errorMessage) => {
+  let match = /^Argument\s+\"filter\" has invalid value (\{.*\})\./i.exec(errorMessage);
+  return (match) ? match[1] : null;
+};
+
+const getGraphqlErrors = (e) => {
+  let responseErrors = _.get(e, 'response.errors', []);
+  return _.map(responseErrors, r => r.message).filter(e => !!e).map(s => s.replace(/\n/g, ' ')).join('\n');
+};
+
+const handleInvalidFilterError = (req, res, e) => {
+  let errorMessage = (_.isString(e) ? e : e.message ) || '';
+  let invalidFilter = /setting\s+.+\s+filter\s+property\s+as\s+\w+\s+value\s+with\s+invalid\s+operator/i.exec(errorMessage);
+  if (!invalidFilter) {
+    return false;
+  }
+  res.status(400);
+  res.json({
+    ...req.requestMetaData,
+    httpStatus: 400,
+    error: {
+      type: "INVALID_FILTER_OPERATOR",
+      message: 'Use of unsupported filtering operator in the provided filter.',
+      details: e.message
+    }
+  });
+};
+
+const handleUnknownFilter = (req, res, e) => {
+  let errorMessage = (_.isString(e) ? e : e.message ) || '';
+  let invalidFilter = /Cannot\s+parse\s+all\s+of\s+the\s+filter\s+string\.\s+Unknown\s+filter/i.exec(errorMessage);
+  if (!invalidFilter) {
+    return false;
+  }
+  res.status(400);
+  res.json({
+    ...req.requestMetaData,
+    httpStatus: 400,
+    error: {
+      type: "UNKNOWN_FILTER",
+      message: 'Use of unsupported filtering semantics.',
+      details: e.message
+    }
+  });
+}
+const handleInvalidGraphQLFilterError = (req, res, e) => {
+  let errorMessage = (_.isString(e) ? e : e.message ) || '';
+  let invalidFilter = getInvalidFilterFromError(errorMessage);
+  if (!invalidFilter) {
+    return false;
+  }
+
+  res.status(400);
+  res.json({
+    ...req.requestMetaData,
+    httpStatus: 400,
+    error: {
+      type: "INVALID_FILTER",
+      message: "The provided filter is invalid for this entity type (" + invalidFilter + ").",
+      details: getGraphqlErrors(e)
+    }
+  });
+
+  return true;
+};
+
+const handleGenericGraphQLError = (req, res, e) => {
+  let isGraphQLError = (_.has(e, 'message') && _.has(e, 'stack') && _.has(e, 'response.errors') && _.has(e, 'request'));
+  if (!isGraphQLError) {
+    return false;
+  }
+
+  res.status(400);
+  res.json({
+    ...req.requestMetaData,
+    httpStatus: 400,
+    error: {
+      type: "INVALID_REQUEST",
+      message: "A backend service error occured while processing the request.",
+      details: getGraphqlErrors(e)
+    }
+  });
+};
+
 const _handleRequest = (pr, req, res) => {
   return pr.then(doc => {
-    doc = applyMetaData(doc, req);
+    doc = applyMetaData(doc, req, {httpStatus: 200});
     if (doc.data === null) {
       return Promise.resolve(_handleMissing(req, res));
     }
@@ -72,15 +164,22 @@ const _handleRequest = (pr, req, res) => {
     res.end();
   }).catch(e => {
     res.setHeader('Content-Type', 'application/json');
-    res.status(404);
-    res.json({error: e});
+    if (
+      !handleInvalidFilterError(req, res, e) &&
+      !handleUnknownFilter(req, res, e) &&
+      !handleInvalidGraphQLFilterError(req, res, e) &&
+      !handleGenericGraphQLError(req, res, e)
+    ) {
+      res.status(500);
+      res.json({...req.requestMetaData, httpStatus: 500, error: e});
+    }
     res.end();
   });
 }
 
 const getCollectionRequestParams = (req) => {
   return {
-    filter: {},
+    filter: _.trim(req.query.filter) || {},
     limit: parseInt(req.query.limit) || DEFAULT_LIMIT,
     skip: parseInt(req.query.skip) || 0
   };
