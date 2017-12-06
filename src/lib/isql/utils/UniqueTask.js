@@ -106,8 +106,10 @@ class UniqueTask {
     };
 
     this._subscribers.push(subscriber);
-
-    return new Promise(UniqueTask.SubscriberPromiseHandler.bind(subscriber));
+    return new Promise((res, rej) => {
+      subscriber.onResolve = subscriber.onResolve(res);
+      subscriber.onReject = subscriber.onReject(rej);
+    });
   }
 }
 
