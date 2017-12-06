@@ -1,6 +1,6 @@
 import _ from 'lodash';
 import {query, TEMPLATE_COLLECTION_HEADER} from './restModel';
-import {filterToGraphQL, resultHandlerByPath} from './utils';
+import {filterToGraphQL, asyncFilterToGraphQL, resultHandlerByPath} from './utils';
 import gql from 'graphql-tag';
 import {TEMPLATE_SITE_ITEM_FIELDS, TEMPLATE_SITE_DETAILS_FIELDS} from './Site';
 import {TEMPLATE_SITE_SERVICE_COLLECTION_FIELDS, TEMPLATE_SITE_SERVICE_DETAILS_FIELDS} from './SiteService';
@@ -54,18 +54,18 @@ export const getCallerByIdentifier = (id, onlyQuery = false) => {
 };
 
 export const getAll = ({filter = {}, limit = 0, skip = 0} = {filter:{}, limit: 0, skip: 0}) => {
-  let flt = filterToGraphQL(filter);
-
-  return query(gql`
-    {
-      data: siteServiceImages(filter: ${flt}, limit: ${limit}, skip: ${skip}) {
-        ${TEMPLATE_COLLECTION_HEADER}
-        items {
-        ${TEMPLATE_SITE_SERVICE_IMAGE_COLLECTION_FIELDS}
+  return asyncFilterToGraphQL(filter).then(flt => {
+    return query(gql`
+      {
+        data: siteServiceImages(filter: ${flt}, limit: ${limit}, skip: ${skip}) {
+          ${TEMPLATE_COLLECTION_HEADER}
+          items {
+          ${TEMPLATE_SITE_SERVICE_IMAGE_COLLECTION_FIELDS}
+          }
         }
       }
-    }
-  `);
+    `);
+  });
 };
 
 export const getByIdentifier = (id) => {
@@ -87,7 +87,7 @@ export const getSiteService = (imageId) => {
         ${TEMPLATE_SITE_SERVICE_DETAILS_FIELDS}
       }
     }
-  }`).then(resultHandlerByPath('data.service'));
+  }`).then(resultHandlerByPath('data.service as data'));
 };
 
 export const getSite = (imageId) => {
@@ -99,26 +99,27 @@ export const getSite = (imageId) => {
         ${TEMPLATE_SITE_DETAILS_FIELDS}
       }
     }
-  }`).then(resultHandlerByPath('data.site'));
+  }`).then(resultHandlerByPath('data.site as data'));
 };
 
 export const getAllSiteServiceTemplates =   (imageId, {filter = {}, limit = 0, skip = 0} = {filter:{}, limit: 0, skip: 0}) => {
-  let caller = getCallerByIdentifier(imageId);
-  let templatesFlt = filterToGraphQL(filter);
-  let templatesQuery = `
-    templates(filter: ${templatesFlt}, limit: ${limit}, skip: ${skip}) {
-      ${TEMPLATE_COLLECTION_HEADER}
-      items {
-      ${TEMPLATE_SITE_SERVICE_TEMPLATE_COLLECTION_FIELDS}
+  return asyncFilterToGraphQL(filter).then(templatesFlt => {
+    let caller = getCallerByIdentifier(imageId);
+    let templatesQuery = `
+      templates(filter: ${templatesFlt}, limit: ${limit}, skip: ${skip}) {
+        ${TEMPLATE_COLLECTION_HEADER}
+        items {
+        ${TEMPLATE_SITE_SERVICE_TEMPLATE_COLLECTION_FIELDS}
+        }
       }
-    }
-  `;
-  return query(gql`{
-    data: ${caller} {
-      id
-      ${templatesQuery}
-    }
-  }`).then(resultHandlerByPath('data.templates'));
+    `;
+    return query(gql`{
+      data: ${caller} {
+        id
+        ${templatesQuery}
+      }
+    }`).then(resultHandlerByPath('data.templates'));
+  });
 };
 
 export const getSiteServiceTemplate = (imageId, templateId) => {
