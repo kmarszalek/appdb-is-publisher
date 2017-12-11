@@ -46,7 +46,7 @@ type Site {
   timezone: String
   # Site coordinates (latitude) (SiteLatitude@gocdb)
   latitude: Float
-  # Site coordinates (longitude) (SiteLongitude#gocdb)
+  # Site coordinates (longitude) (SiteLongitude@gocdb)
   longitude: Float
   # Site domain name (SiteDomainname@gocdb)
   domainName: String
@@ -110,6 +110,10 @@ input Site_Filter {
   domainName: FilterStringOperators
   # Information system data hash value
   hash: String
+  # Filter by site service statuses (SiteServiceStatus@argo)
+  serviceStatuses: SiteServiceStatus_Filter
+  # Filter by site service downtimes (SiteServiceStatus@gocdb)
+  serviceDowntimes: SiteServiceDowntime_Filter
   # Filter by site's services values
   services: SiteService_Filter
   # Filter by site's images values

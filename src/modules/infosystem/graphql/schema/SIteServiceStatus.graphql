@@ -2,10 +2,22 @@ enum SiteServiceStatusType {
   service
 }
 
+input SiteServiceStatusType_Filter {
+  eq: SiteServiceStatusType,
+  ne: SiteServiceStatusType,
+  oneOf: [SiteServiceStatusType]
+}
+
 enum SiteServiceStatusValue {
   OK
   MISSING
   CRITICAL
+}
+
+input SiteServiceStatusValue_Filter {
+  eq: SiteServiceStatusValue,
+  ne: SiteServiceStatusValue,
+  oneOf: [SiteServiceStatusValue]
 }
 
 type SiteServiceStatus {
@@ -20,9 +32,9 @@ type SiteServiceStatus {
 
 input SiteServiceStatus_Filter {
   id: FilterStringOperators
-  type: SiteServiceStatusType
+  type: SiteServiceStatusType_Filter
   endpointGroup: FilterStringOperators
-  value: SiteServiceStatusValue
+  value: SiteServiceStatusValue_Filter
   timestamp: FilterStringOperators
   siteService: SiteService_Filter
   site: Site_Filter

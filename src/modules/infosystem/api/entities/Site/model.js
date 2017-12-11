@@ -31,10 +31,12 @@ function SiteModel(context) {
       'domainName'          : 'info.SiteDomainname',
       'hash'                : 'info.hash'
     },
-    relationMap         : {
-      'services'        : {name: 'SiteService', relationType: 'hasMany', relationOn: {key: 'info.SitePKey', foreignKey:  'info.SitePKey'}},
-      'images'          : {name: 'SiteServiceImage', relationType: 'hasMany', relationOn: {key: 'info.SitePKey', foreignKey: 'info.SitePKey'}},
-      'templates'       : {name: 'SiteServiceTemplate', relationType: 'hasMany', relationOn: {key: 'info.SitePKey', foreignKey: 'info.SitePKey'}}
+    relationMap          : {
+      'services'         : {name: 'SiteService', relationType: 'hasMany', relationOn: {key: 'info.SitePKey', foreignKey:  'info.SitePKey'}},
+      'images'           : {name: 'SiteServiceImage', relationType: 'hasMany', relationOn: {key: 'info.SitePKey', foreignKey: 'info.SitePKey'}},
+      'templates'        : {name: 'SiteServiceTemplate', relationType: 'hasMany', relationOn: {key: 'info.SitePKey', foreignKey: 'info.SitePKey'}},
+      'serviceStatuses'  : {name: 'SiteServiceStatus', relationType: 'hasMany', relationOn: {key: 'info.SitePKey', foreignKey: 'info.SitePKey'}},
+      'serviceDowntimes' : {name: 'SiteServiceDowntime', relationType: 'hasMany', relationOn: {key: 'info.SitePKey', foreignKey: 'info.SitePKey'}}
     }
   });
 }

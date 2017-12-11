@@ -171,6 +171,10 @@ input SiteService_Filter {
   numberOfTemplates: FilterIntegerOperators
   # Filter by the hosting site's values
   site: Site_Filter
+  # Filter by site service statuses (SiteServiceStatus@argo)
+  serviceStatuses: SiteServiceStatus_Filter
+  # Filter by site service downtimes (SiteServiceStatus@gocdb)
+  serviceDowntimes: SiteServiceDowntime_Filter
   #withDowntimeCount: FilterIntegerOperators
   #withImageCount: FilterIntegerOperators
   #withTemplateCount: FilterIntegerOperators

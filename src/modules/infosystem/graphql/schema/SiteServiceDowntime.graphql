@@ -1,15 +1,34 @@
 enum SiteServiceDowntimeOutcome {
   ended
   upcomming
+  ongoing
+}
+
+input SiteServiceDowntimeOutcome_Filter {
+  eq: SiteServiceDowntimeOutcome,
+  ne: SiteServiceDowntimeOutcome,
+  oneOf: [SiteServiceDowntimeOutcome]
 }
 
 enum SiteServiceDowntimeSeverity {
   OUTAGE
 }
 
+input SiteServiceDowntimeSeverity_Filter {
+  eq: SiteServiceDowntimeSeverity,
+  ne: SiteServiceDowntimeSeverity,
+  oneOf: [SiteServiceDowntimeSeverity]
+}
+
 enum SiteServiceDowntimeClassification {
   SCHEDULED
   UNSCHEDULED
+}
+
+input SiteServiceDowntimeClassification_Filter {
+  eq: SiteServiceDowntimeClassification,
+  ne: SiteServiceDowntimeClassification,
+  oneOf: [SiteServiceDowntimeClassification]
 }
 
 type SiteServiceDowntime {
@@ -31,15 +50,15 @@ type SiteServiceDowntime {
 input SiteServiceDowntime_Filter {
   id: FilterStringOperators
   downtimePKey: FilterStringOperators
-  classification: SiteServiceDowntimeClassification
-  severity: SiteServiceDowntimeSeverity
+  classification: SiteServiceDowntimeClassification_Filter
+  severity: SiteServiceDowntimeSeverity_Filter
   startDate: FilterIntegerOperators
   endDate: FilterIntegerOperators
   formatedStartDate: FilterStringOperators
   formatedEndDate: FilterStringOperators
   serviceType: FilterStringOperators
   gocPortalUrl: FilterStringOperators
-  outcome: SiteServiceDowntimeOutcome
+  outcome: SiteServiceDowntimeOutcome_Filter
   site: Site_Filter
   service: SiteService_Filter
   #or: [SiteServiceDowntime_Filter]
