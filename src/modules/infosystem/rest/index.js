@@ -95,6 +95,8 @@ const handleInvalidFilterError = (req, res, e) => {
       details: e.message
     }
   });
+
+  return true;
 };
 
 const handleUnknownFilter = (req, res, e) => {
@@ -113,6 +115,8 @@ const handleUnknownFilter = (req, res, e) => {
       details: e.message
     }
   });
+
+  return true;
 }
 const handleInvalidGraphQLFilterError = (req, res, e) => {
   let errorMessage = (_.isString(e) ? e : e.message ) || '';
@@ -151,6 +155,8 @@ const handleGenericGraphQLError = (req, res, e) => {
       details: getGraphqlErrors(e)
     }
   });
+
+  return true;
 };
 
 const _handleRequest = (pr, req, res) => {
