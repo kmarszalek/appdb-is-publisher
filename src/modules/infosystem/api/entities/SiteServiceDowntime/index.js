@@ -1,5 +1,6 @@
 import initModel from './model';
 import {getArgsWithBaseFilter} from '../utils';
+import _ from 'lodash';
 
 function _initSiteServiceDowntime(context) {
   const _SiteServiceDowntimeModel = initModel(context);
