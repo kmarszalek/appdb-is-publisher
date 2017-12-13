@@ -57,38 +57,52 @@ function _initServer(conf) {
 
   app.use(
     '/graphql',
-    [bodyParser.json(),
-    function(req, res, next) {
-      let logger = conf.getLogger('graphql');
-      let md5 = require('crypto').createHash('md5').update(JSON.stringify(req.body) + (new Date()).getTime()).digest("hex");
-      req.md5Hash = md5;
-      req.statistics = {
-        startedAt: new Date(),
-        totalDBRequests: 0,
-        totalDBTime: 1,
-        totalDBTimeString: function() {
-          return '' + (this.totalDBTime / 1000) + ' seconds';
-        },
-        totalProcessTime: 1,
-        totalProcessTimeString: function() {
-          return '' + (this.totalProcessTime / 1000) + ' seconds';
-        },
-        totalRequestTime: function() {
-          return (this.startedAt.getTime() - (new Date()).getTime());
-        },
-        totalRequestTimeString: function() {
-          return '' + (this.totalRequestTime / 1000) + ' seconds';
+    [
+      bodyParser.json(),
+      function(req, res, next) {
+        res.header('Access-Control-Allow-Credentials', true);
+        res.header('Access-Control-Allow-Headers', 'content-type, authorization, content-length, x-requested-with, accept, origin');
+        res.header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
+        res.header('Access-Control-Allow-Origin', '*');
+        if (req.method === 'OPTIONS') {
+          res.sendStatus(200);
+          res.end();
+        } else {
+          next();
         }
-      };
-      //logger.log('info', 'GraphQL::' + md5 , 'Started request');
-      console.log('\x1b[32m[GraphQL::' + md5 + ']\x1b[0m: Started request');
-      res.on('finish', function() {
-        let endedAt = new Date();
-        let diff =  (endedAt.getTime() - this.startedAt.getTime()) / 1000;
-        console.log('\x1b[32m[GraphQL::' + md5 + ']\x1b[0m: Ended request. Took \x1b[35m' + diff + '\x1b[0m seconds');
-      }.bind({startedAt: new Date()}));
-      next();
-    }],
+      },
+      function(req, res, next) {
+        let logger = conf.getLogger('graphql');
+        let md5 = require('crypto').createHash('md5').update(JSON.stringify(req.body) + (new Date()).getTime()).digest("hex");
+        req.md5Hash = md5;
+        req.statistics = {
+          startedAt: new Date(),
+          totalDBRequests: 0,
+          totalDBTime: 1,
+          totalDBTimeString: function() {
+            return '' + (this.totalDBTime / 1000) + ' seconds';
+          },
+          totalProcessTime: 1,
+          totalProcessTimeString: function() {
+            return '' + (this.totalProcessTime / 1000) + ' seconds';
+          },
+          totalRequestTime: function() {
+            return (this.startedAt.getTime() - (new Date()).getTime());
+          },
+          totalRequestTimeString: function() {
+            return '' + (this.totalRequestTime / 1000) + ' seconds';
+          }
+        };
+        //logger.log('info', 'GraphQL::' + md5 , 'Started request');
+        console.log('\x1b[32m[GraphQL::' + md5 + ']\x1b[0m: Started request');
+        res.on('finish', function() {
+          let endedAt = new Date();
+          let diff =  (endedAt.getTime() - this.startedAt.getTime()) / 1000;
+          console.log('\x1b[32m[GraphQL::' + md5 + ']\x1b[0m: Ended request. Took \x1b[35m' + diff + '\x1b[0m seconds');
+        }.bind({startedAt: new Date()}));
+        next();
+      }
+    ],
     graphqlExpress(req => {
       return {
         schema: conf.graphQLSchema,
