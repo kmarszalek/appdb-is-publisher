@@ -118,7 +118,9 @@ function _createExecutionPlanner({modelName, mapper}) {
     operateOn = EXECUTION_PLAN_OPERATE_ON.NONE,
     query = {},
     relations = null,
-    relationType = null
+    relationType = null,
+    identifier = '_id',
+    identifierProperty = 'id'
   } = {
     name: modelName,
     stepType: EXECUTION_PLAN_STEP_TYPE.INIT,
@@ -126,7 +128,9 @@ function _createExecutionPlanner({modelName, mapper}) {
     operateOn: EXECUTION_PLAN_OPERATE_ON.NONE,
     query: {},
     relations:  null,
-    relationType: null
+    relationType: null,
+    identifier: '_id',
+    identifierProperty: 'id'
   }) => {
 
     let descr = {
@@ -134,7 +138,9 @@ function _createExecutionPlanner({modelName, mapper}) {
       stepType,
       operationType,
       operateOn,
-      query
+      query,
+      identifier,
+      identifierProperty
     };
 
     if (relations) {
@@ -166,6 +172,8 @@ function _createExecutionPlanner({modelName, mapper}) {
       operationType: EXECUTION_PLAN_OPERATION_TYPE.NONE,
       operationOn: EXECUTION_PLAN_OPERATE_ON.NONE,
       query: {filter: sepFilter.internal, fields: primaryKeys},
+      identifier: mapper.getIdentifierField(),
+      identifierProperty: mapper.getIdentifierProperty()
     });
 
     let maps = _.reduce(sepFilter.external, (acc, val, key) => {
