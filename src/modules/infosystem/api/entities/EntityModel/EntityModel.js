@@ -48,6 +48,14 @@ const _createModel = (
     excludeFields     = [],
     //Custom processing of fecthed fields before exporting and/or translate them to properties
     postProcessFields = {},
+    //Custom processing of arguments before operation execution. Runs before postProcessFields.
+    //Is an object with keys the operation names and value an array of functions getting the arguments of operation and
+    //a callback function passing the new arguments to the next funcion if any, otherwise passes arguments to the original operation.
+    preProcessOperations = {},
+    //Custom processing of operation execution response. Runs after the operation returns.
+    //Is an object with keys the operation names and value an array of function getting an object {initialArgs, args, response}, the context and
+    //a callback function passing the new response to the next function if any, otherwise retruns to the original caller of the stack.
+    postProcessOperations = {},
     //The DB connection instance
     dbConnection      = _errorMandatoryField('[InfoSystem:api:entities:createModel] Must give DB connection object'),
   } = {}
@@ -162,6 +170,75 @@ const _createModel = (
     return _.first(_map(data)) || null;
   };
 
+  // Applies a chain of pre process and post process operations to the given action
+  const _applyProcessOperationHooks = (
+    hookedFunc,
+    preOps = [],
+    postOps = []
+  ) => {
+    //If no pre/post process operations defined simply return the function itself
+    if (!preOps.length && !postOps.length) {
+      return hookedFunc;
+    }
+
+    // Help function to create temp storage throughout the hook lifecycle
+    const _createHookStorage = (storage = {initialCallArgs: [], callArgs: [], response: null}) => {
+      return (name, val) => {
+        if (name) {
+          if (val) {
+            storage[name] = val;
+          }
+          return storage[name];
+        }
+        return storage;
+      }
+    };
+
+    return (...argus) => {
+      // Create hook storage to store intermediate data between hook operations
+      let hookStorage = _createHookStorage({
+        // Copy initial arguments
+        initialCallArgs: [].concat(argus),
+        // Arguments to pass to preOps
+        callArgs: _.merge([], argus),
+        // Response from actual function call
+        response: null
+      });
+
+      return preOps.reduce(//Call pre process operations sequencially
+          (acc, preOp) => acc.then(newCallArgs => preOp(...newCallArgs)),
+          Promise.resolve(hookStorage('callArgs'))
+        )
+        // Store call arguments to hook storage
+        .then(callArgs => hookStorage('callArgs', callArgs))
+        // Make actual function call with arguments passed from preOps execution chain response
+        .then(callArgs => hookedFunc(...callArgs))
+        // Store actual response
+        .then(response => hookStorage('response', response))
+        // Prepare arguments for post process operations
+        .then(response => [hookStorage('initialCallArgs'), hookStorage('callArgs'), hookStorage('response')])
+        // Call post process operations sequencially
+        .then(postArgs => postOps.reduce((acc, postOp) => acc.then(postArgs => postOp(...postArgs)), Promise.resolve(postArgs)))
+        // Retrieve post process operations response object
+        .then(postArgs => postArgs[2]);
+    };
+  };
+
+  //Find and apply hook operations to the supported functions if any.
+  const _applyHooks = (supportedOps = null) => {
+    supportedOps = supportedOps || ['findMany', 'findOne', 'getCount', 'fetchMany'];
+    preProcessOperations = preProcessOperations || {};
+    postProcessOperations = postProcessOperations || {};
+
+    supportedOps.forEach((opName) => {
+      let preOps = preProcessOperations[opName] || [];
+      let postOps = postProcessOperations[opName] || [];
+      if (preOps.length && postOps.length && _.isFunction(_modelOps[opName])) {
+        _modelOps[opName] = _applyProcessOperationHooks(_modelOps[opName], preOps, postOps);
+      }
+    });
+  };
+
   const _modelOps = {
     findMany: findMany,
     findOne: findOne,
@@ -176,8 +253,9 @@ const _createModel = (
     getExecutionEngine: () => _execEngine,
     map: _map,
     mapOne: _mapOne
-
   };
+
+  _applyHooks();
 
   EntityModelRegistry.register(name, _modelOps);
 
