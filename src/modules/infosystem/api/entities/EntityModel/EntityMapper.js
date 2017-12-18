@@ -295,6 +295,19 @@ function _createMapper(modelName, {baseFilter = {}, baseFields = [], propertyMap
 
   const _getPropertiesFromFields = (doc) => _documentFieldsTranspiler(doc);
   const _getRelationMap = () => Object.assign({}, relationMap || {});
+  const _getIdentifierField = () => {
+    if (_.isFunction(_propertyMapper['id'])) {
+      return _propertyMapper['id']();
+    }
+    return null;
+  };
+
+  const _getIdentifierProperty = () => {
+    if (_.isFunction(_propertyMapper['id']) && _.isFunction(_fieldMapper[_propertyMapper['id']()])) {
+      return _fieldMapper[_propertyMapper['id']()]();
+    }
+    return null;
+  };
 
   return {
     getQuery: _getMangoQuery,
@@ -302,7 +315,9 @@ function _createMapper(modelName, {baseFilter = {}, baseFields = [], propertyMap
     getOperatorMapper: () => _operatorMapper,
     getArrayOperatorMapper: () => _arrayOperatorMapper,
     getPropertiesFromFields: _getPropertiesFromFields,
-    getRelationMap: _getRelationMap
+    getRelationMap: _getRelationMap,
+    getIdentifierField: _getIdentifierField,
+    getIdentifierProperty: _getIdentifierProperty
   };
 };
 
