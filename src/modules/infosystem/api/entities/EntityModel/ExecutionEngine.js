@@ -149,6 +149,8 @@ function _createExecutionEngine({modelName, dbConnection, mapper}) {
     plan = _initializeExecutionPlan(plan);
     logger(modelName+'.' + plan.level, 'INITED PLAN', plan.context);
     let rootData = null;
+    let rootIdentifier = _.get(plan, 'steps.init.identifier', '_id');
+    let rootIdentifierProperty = _.get(plan, 'steps.init.identifierProperty', 'id');
 
     if (plan.steps.init) {
       logger(modelName+'.' + plan.level , 'PERFORM INIT STEP ' +  JSON.stringify(plan.steps.init.query), plan.context);
@@ -202,10 +204,10 @@ function _createExecutionEngine({modelName, dbConnection, mapper}) {
     } else if (plan.level >  0) {
       rootCollection = reducedData || [];
     } else {
-      let rootIds = reducedData.map(d => d._id);
+      let rootIds = reducedData.map(d => _.get(d, rootIdentifier, d._id));
       let rootRequest = Object.assign({}, plan.initialRequest || {});
 
-      rootRequest.filter = (rootIds.length === 1) ? {_id: {$eq: rootIds[0]}} : {_id: {$in: rootIds}};
+      rootRequest.filter = (rootIds.length === 1) ? _.set({}, `${rootIdentifier}.$eq`, rootIds[0]) : _.set({}, `${rootIdentifier}.$in`, rootIds);
       rootRequest.wrapItemsToCollection = false;
       rootRequest.translateProperties = true;
       rootRequest.fields = plan.initialRequest.fields;
@@ -217,7 +219,7 @@ function _createExecutionEngine({modelName, dbConnection, mapper}) {
     }
 
     let execResults = getExecutionResults(plan, rootCollection, rootTotalCount);
-    logger(modelName + '.' + plan.level, 'PLAN FINISHED WITH ' + _.get(execResults, 'items', []).map(item => item.id).join(', '), plan.context);
+    logger(modelName + '.' + plan.level, 'PLAN FINISHED WITH ' + _.get(execResults, 'items', []).map(item => _.get(item, rootIdentifierProperty, JSON.stringify(item))).join(', '), plan.context);
     return execResults;
   }
 
