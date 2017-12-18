@@ -1,0 +1,28 @@
+type VO {
+  name: String
+  sites(filter: Site_Filter, limit: Int, skip: Int, sort: [Site_Sort]): SiteCollection
+  services(filter: SiteService_Filter, limit: Int, skip: Int, sort: [SiteService_Sort]): SiteServiceCollection
+  templates(filter: SiteServiceTemplate_Filter, limit: Int, skip: Int, sort: [SiteServiceTemplate_Sort]): SiteServiceTemplateCollection
+  images(filter: SiteServiceImage_Filter, limit: Int, skip: Int, sort: [SiteServiceImage_Sort]): SiteServiceImageCollection
+}
+
+input VO_Filter {
+  name: FilterStringOperators,
+  sites: Site_Filter,
+  services: SiteService_Filter,
+  images: SiteServiceImage_Filter,
+  templates: SiteServiceTemplate_Filter
+}
+
+type VOCollection {
+  totalCount: Int
+  count: Int
+  limit: Int
+  skip: Int
+  items: [VO]
+}
+
+extend type Query {
+  voByName(name: String!): VO
+  vos(filter: VO_Filter, limit: Int, skip: Int): VOCollection
+}
