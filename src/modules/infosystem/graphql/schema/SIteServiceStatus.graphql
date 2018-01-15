@@ -12,6 +12,7 @@ enum SiteServiceStatusValue {
   OK
   MISSING
   CRITICAL
+  WARNING
 }
 
 input SiteServiceStatusValue_Filter {
