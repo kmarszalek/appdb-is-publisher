@@ -2,6 +2,7 @@ import Site from './Site';
 import SiteService from './SiteService';
 import SiteServiceImage from './SiteServiceImage';
 import SiteServiceTemplate from './SiteServiceTemplate';
+import SiteServiceStatus from './SiteServiceStatus';
 import _ from 'lodash';
 
 const DEFAULT_LIMIT = 20;
@@ -388,6 +389,31 @@ export const expressRouter = function (router, config) {
 
     _handleRequest(SiteServiceImage.getAll(params), req, res);
   });
+
+  router.get('/statuses/:statusId/service', [CollectionMetaData({entityType: 'SiteServiceStatus'})], (req, res) => {
+    let statusId = _.trim(req.params.statusId);
+
+    _handleRequest(SiteServiceStatus.getSiteService(statusId), req, res);
+  });
+
+  router.get('/statuses/:statusId/site', [CollectionMetaData({entityType: 'SiteServiceStatus'})], (req, res) => {
+    let statusId = _.trim(req.params.statusId);
+
+    _handleRequest(SiteServiceStatus.getSite(statusId), req, res);
+  });
+
+  router.get('/statuses/:statusId', [CollectionMetaData({entityType: 'SiteServiceStatus'})], (req, res) => {
+    let statusId = _.trim(req.params.statusId);
+
+    _handleRequest(SiteServiceStatus.getByIdentifier(statusId), req, res);
+  });
+
+  router.get('/statuses', [CollectionMetaData({entityType: 'SiteServiceStatus'})], (req, res) => {
+    let params = getCollectionRequestParams(req);
+
+    _handleRequest(SiteServiceStatus.getAll(params), req, res);
+  });
+
 
   router.get('/', (req, res) => {
     res.setHeader('Content-Type', 'application/json');
