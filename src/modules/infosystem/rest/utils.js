@@ -10,7 +10,7 @@ export const filterToGraphQL = (filter, level = 0) => {
 
   if (_.isString(filter)) {
     let parsedFilter = parseFilterString(filter);
-    console.log('filtertographql::: ', parsedFilter);
+
     if (parsedFilter.errors.length) {
       throw new Error(parsedFilter.errors[0]);
     }
@@ -111,7 +111,6 @@ const _FilterExpressions = [
 
 export const parseFilterString = (query) => {
   if (_.isPlainObject(query)) {
-    console.log('parseFilterString is plain object');
     return {filter: query, errors: []};
   }
 
