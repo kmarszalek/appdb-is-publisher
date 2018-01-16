@@ -34,11 +34,42 @@ domainName
 
 export const TEMPLATE_SITE_DETAILS_FIELDS = `
 ${TEMPLATE_SITE_ITEM_FIELDS}
+serviceStatuses{
+  id
+  type
+  endpointGroup
+  value
+  timestamp
+  siteService {
+    id
+    endpointPKey
+    endpointURL
+  }
+}
+serviceDowntimes{
+  id
+  downtimePKey
+  classification
+  severity
+  startDate
+  endDate
+  formatedStartDate
+  formatedEndDate
+  serviceType
+  gocPortalUrl
+  outcome
+  service{
+    id
+    endpointPKey
+    endpointURL
+  }
+}
 services (skip: 0, limit: 100000) {
   totalCount
   items {
     id
     endpointPKey
+    endpointURL
   }
 }`;
 
