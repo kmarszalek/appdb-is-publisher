@@ -51,39 +51,30 @@ export const getCallerByIdentifier = (id, onlyQuery = false) => {
   if (onlyQuery) {
     return `id: {eq: "${id}"}`;
   }else {
-    return `siteServiceStatuses(filter:{id: {eq: "${id}"}})`;
+    return `siteServiceStatusById(id: "${id}")`;
   }
 };
 
 export const getByIdentifier = (id) => {
   let caller = getCallerByIdentifier(id);
-  console.log(`{
-    data: ${caller} {
-      items {
-        ${TEMPLATE_SITE_SERVICE_STATUS_DETAILS_FIELDS}
-      }
-    }`);
+
   return query(gql`{
     data: ${caller} {
-      items {
-        ${TEMPLATE_SITE_SERVICE_STATUS_DETAILS_FIELDS}
-      }
+      ${TEMPLATE_SITE_SERVICE_STATUS_DETAILS_FIELDS}
     }
-  }`).then(resultHandlerByPath('data.items.0 as data'));
+  }`);
 };
 
 export const getSite = (id) => {
   let caller = getCallerByIdentifier(id);
   return query(gql`{
     data: ${caller} {
-      items{
-        id
-        site {
-          ${TEMPLATE_SITE_DETAILS_FIELDS}
-        }
+      id
+      site {
+        ${TEMPLATE_SITE_DETAILS_FIELDS}
       }
     }
-  }`).then(resultHandlerByPath('data.items.0.site as data'));
+  }`).then(resultHandlerByPath('data.site as data'));
 };
 
 export const getSiteService = (id, imageId) => {
@@ -91,14 +82,12 @@ export const getSiteService = (id, imageId) => {
 
   return query(gql`{
     data: ${caller} {
-      items {
-        id
-        siteService{
-          ${TEMPLATE_SITE_SERVICE_DETAILS_FIELDS}
-        }
+      id
+      siteService{
+        ${TEMPLATE_SITE_SERVICE_DETAILS_FIELDS}
       }
     }
-  }`).then(resultHandlerByPath('data.items.0.siteService as data'));
+  }`).then(resultHandlerByPath('data.siteService as data'));
 };
 
 export const getAll = ({filter = {}, limit = 0, skip = 0} = {filter:{}, limit: 0, skip: 0}) => {
