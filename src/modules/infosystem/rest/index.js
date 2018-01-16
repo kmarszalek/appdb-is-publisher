@@ -542,6 +542,30 @@ export const serviceDescription = {
       },
       '/templates/<id>/images/<id>': {
         description: 'A VM image entry that can use the current template.'
+      },
+      '/statuses': {
+        description: 'List of argo service status entries in the information system.'
+      },
+      '/statuses/<id>': {
+        description: 'An argo service status entry in the information system. Can be retrieved with the information system ID.'
+      },
+      '/statuses/<id>/site': {
+        description: 'The related site entry that the current argo entry refers to.'
+      },
+      '/statuses/<id>/service': {
+        description: 'The related site service entry that the current argo entry refers to.'
+      },
+      '/downtimes': {
+        description: 'List of GocDB downtime report entries in the information system.'
+      },
+      '/downtimes/<id>': {
+        description: 'A GocDB downtime report entry in the information system. Can be retrieved with the information system ID.'
+      },
+      '/downtimes/<id>/site': {
+        description: 'The related site entry that the current GocDB downtime report entry refers to.'
+      },
+      '/downtimes/<id>/service': {
+        description: 'The related site service entry the current  GocDB downtime report entry refers to.'
       }
     }
   }
