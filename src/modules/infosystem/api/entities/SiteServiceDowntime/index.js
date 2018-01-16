@@ -7,7 +7,7 @@ function _initSiteServiceDowntime(context) {
 
   const SiteServiceDowntime = {};
 
-  SiteServiceDowntime.getById = (id) => _SiteServiceDowntimeModel.getById(id);
+  SiteServiceDowntime.getById = (id, context) => _SiteServiceDowntimeModel.getById(id, context);
 
   SiteServiceDowntime.getAll = ({root, args, context}) => _SiteServiceDowntimeModel.findMany(args, context);
 

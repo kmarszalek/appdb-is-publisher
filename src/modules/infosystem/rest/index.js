@@ -3,6 +3,7 @@ import SiteService from './SiteService';
 import SiteServiceImage from './SiteServiceImage';
 import SiteServiceTemplate from './SiteServiceTemplate';
 import SiteServiceStatus from './SiteServiceStatus';
+import SiteServiceDowntime from './SiteServiceDowntime';
 import _ from 'lodash';
 
 const DEFAULT_LIMIT = 20;
@@ -25,7 +26,7 @@ const applyMetaData = (doc, req, ext) => {
   return doc;
 };
 
-const _handleMissing = (req, res) => {console.log(';HANDLING MISSING!!!!!1');
+const _handleMissing = (req, res) => {
   res.setHeader('Content-Type', 'application/json');
   res.status(404);
   let doc = {
@@ -390,6 +391,10 @@ export const expressRouter = function (router, config) {
     _handleRequest(SiteServiceImage.getAll(params), req, res);
   });
 
+  //###########################################
+  //###########  Argo Statuses  ###############
+  //###########################################
+
   router.get('/statuses/:statusId/service', [CollectionMetaData({entityType: 'SiteServiceStatus'})], (req, res) => {
     let statusId = _.trim(req.params.statusId);
 
@@ -414,6 +419,33 @@ export const expressRouter = function (router, config) {
     _handleRequest(SiteServiceStatus.getAll(params), req, res);
   });
 
+  //###########################################
+  //##########  GocDB Downtimes  ##############
+  //###########################################
+
+  router.get('/downtimes/:downtimeId/service', [CollectionMetaData({entityType: 'SiteServiceDowntime'})], (req, res) => {
+    let downtimeId = _.trim(req.params.downtimeId);
+
+    _handleRequest(SiteServiceDowntime.getSiteService(downtimeId), req, res);
+  });
+
+  router.get('/downtimes/:downtimeId/site', [CollectionMetaData({entityType: 'SiteServiceDowntime'})], (req, res) => {
+    let downtimeId = _.trim(req.params.downtimeId);
+
+    _handleRequest(SiteServiceDowntime.getSite(downtimeId), req, res);
+  });
+
+  router.get('/downtimes/:downtimeId', [CollectionMetaData({entityType: 'SiteServiceDowntime'})], (req, res) => {
+    let downtimeId = _.trim(req.params.downtimeId);
+
+    _handleRequest(SiteServiceDowntime.getByIdentifier(downtimeId), req, res);
+  });
+
+  router.get('/downtimes', [CollectionMetaData({entityType: 'SiteServiceDowntime'})], (req, res) => {
+    let params = getCollectionRequestParams(req);
+
+    _handleRequest(SiteServiceDowntime.getAll(params), req, res);
+  });
 
   router.get('/', (req, res) => {
     res.setHeader('Content-Type', 'application/json');
