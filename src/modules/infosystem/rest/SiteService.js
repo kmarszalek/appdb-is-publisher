@@ -45,6 +45,26 @@ entityOtherInfo`;
 
 export const TEMPLATE_SITE_SERVICE_DETAILS_FIELDS =`
 ${TEMPLATE_SITE_SERVICE_ITEM_FIELDS}
+serviceStatus{
+  id
+  type
+  endpointGroup
+  value
+  timestamp
+}
+serviceDowntimes{
+  id
+  downtimePKey
+  classification
+  severity
+  startDate
+  endDate
+  formatedStartDate
+  formatedEndDate
+  serviceType
+  gocPortalUrl
+  outcome
+}
 images: imageList {
   ${TEMPLATE_SITE_SERVICE_IMAGE_COLLECTION_FIELDS}
 }
