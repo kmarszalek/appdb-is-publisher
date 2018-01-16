@@ -1,6 +1,6 @@
 import _ from 'lodash';
 const DEFAULT_INDENT_SPACES = 2;
-
+const ENUM_PREFIX = '$ENUM_';
 const getIndent= (level, spaces = DEFAULT_INDENT_SPACES)  => {
   return _.times(level * spaces, _.constant(' ')).join('');
 };
@@ -10,7 +10,7 @@ export const filterToGraphQL = (filter, level = 0) => {
 
   if (_.isString(filter)) {
     let parsedFilter = parseFilterString(filter);
-
+    console.log('filtertographql::: ', parsedFilter);
     if (parsedFilter.errors.length) {
       throw new Error(parsedFilter.errors[0]);
     }
@@ -22,11 +22,16 @@ export const filterToGraphQL = (filter, level = 0) => {
       acc += ', ';
     }
 
-    acc += getIndent(level) + key + ': ';
+    acc += getIndent(level) + key.replace(ENUM_PREFIX, '') + ': ';
     if (_.isPlainObject(val)) {
       acc += filterToGraphQL(val, level + 1);
     } else if (_.isString(val)) {
-      acc += '"' + val + '"';
+      if (key.indexOf(ENUM_PREFIX) === 0) {
+        acc += val;
+      } else {
+        acc += '"' + val + '"';
+      }
+
     } else {
       acc += val;
     }
@@ -93,6 +98,14 @@ const _FilterExpressions = [
     ops: [],
     noop: (value) => null,
     getValue: (value) => (value.toLowerCase() === 'true')
+  },
+  {
+    name: 'enum',
+    expr: /([a-zA-z\_][a-zA-Z0-9\_]*[\.[a-zA-Z0-9]*)(\:\:\w+)?\:([a-zA-Z0-9]*)/g,
+    ops: ['eq', 'ne', 'oneof'],
+    noop: (value) => 'eq',
+    getValue: (value) => _.trim(value),
+    getOp: (op, value) => ENUM_PREFIX + op
   }
 ];
 
@@ -143,6 +156,9 @@ export const parseFilterString = (query) => {
         }
         acc.errors.push(`Setting "${path}" filter property as "${filterExpr.name}" value with invalid operator "${op}". ${validOps}`);
       } else {
+        if (_.isFunction(filterExpr.getOp)) {
+          op = filterExpr.getOp(op, value);
+        }
         op = (op) ? `.${op}` : '';
         let fltObj = _.set({}, `${path}${op}`, value);
         acc.filter = _.merge(acc.filter, fltObj);
