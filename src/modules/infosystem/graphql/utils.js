@@ -86,7 +86,8 @@ export const resolveArrayWith = (apiAction) => {
   return  (root, args, context, info) => _apiCall({
     root,
     args: prepareItemResolverArgs(args, info),
-    context
+    context,
+    info
   }).then(result => result.items || []);
 
 };
@@ -97,7 +98,8 @@ export const resolveCollectionWith = (apiAction) => {
   return (root, args, context, info) => _apiCall({
     root,
     args: prepareCollectionResolverArgs(args, info),
-    context
+    context,
+    info
   });
 };
 
@@ -107,7 +109,8 @@ export const resolveItemWith = (apiAction) => {
   return (root, args, context, info) => _apiCall({
     root,
     args: prepareItemResolverArgs(args, info),
-    context
+    context,
+    info
   });
 };
 
