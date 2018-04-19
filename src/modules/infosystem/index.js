@@ -8,7 +8,10 @@ const _subModules = {
   graphql: null
 };
 
-async function _init(conf) {
+/**
+ * Initialize and return api, graphql and logger sub modules.
+ */
+async function _init() {
   _subModules.api = await api.init(configuration);
   _subModules.graphql = await graphql.init(configuration);
 

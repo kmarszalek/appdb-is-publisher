@@ -31,7 +31,6 @@ const _compileFieldMap = (props) => _.transform(props, _mappedFieldSetter, {});
  */
 const _createMangoSelectorTranspiler = ({properties = {}, operators = {}, arrayOperators = {}} = {}) => {
   const _filterApplyOperator = (key, val, filter) => {
-    //console.log('Apply operator ['+ key + '] >>> ', (operators[key]) ? operators[key](val) : '<<nothing>>');
     if (key in operators) {
       delete filter[key];
       _.transform(operators[key](val) || {}, (selector, val, key) => {selector[key] = val;}, filter);
@@ -47,7 +46,6 @@ const _createMangoSelectorTranspiler = ({properties = {}, operators = {}, arrayO
     val = Array.isArray(val) ? val : [val];
 
     if (_.isArray(val) && key in arrayOperators) {
-      //console.log('Apply array operator ['+ key + '] >>> ', (arrayOperators[key]) ? arrayOperators[key](val) : '<<nothing>>');
       delete filter[key];
       val = val.map(_transpile);
       _.transform(arrayOperators[key](val) || {}, (selector, val, key) => {selector[key] = val;}, filter);
@@ -103,6 +101,7 @@ const _createMangoSelectorTranspiler = ({properties = {}, operators = {}, arrayO
     }
     return filter;
   };
+
   const _applyFilterComplexFilterProperties = (filter) => {
     return _.transform(filter, (mapped, val, key) => {
       _applyComplexFilterProperties(val, key, mapped);
@@ -157,11 +156,16 @@ const _createMangoSortTranspiler = ({properties}) => {
     sort = Array.isArray(sort) ? sort: [sort];
 
     return sort
-      .filter(_.trim) //exclude empty
-      .map(f => rx.exec('' + f)) // match valid sorting fields
-      .filter(x => !!x) //reject unmatched
-      .map(x => { return {field: x[1], direction:x[2] || 'asc'}; }) //normalize results
-      .map(x => { //transform results to valid mango sort item
+      .filter(_.trim)             //exclude empty
+      .map(f => rx.exec('' + f))  // match valid sorting fields
+      .filter(x => !!x)           //reject unmatched
+      .map(x => {                 //normalize results
+        return {
+          field: x[1],
+          direction:x[2] || 'asc'
+        };
+      })
+      .map(x => {                 //transform results to valid mango sort item
         x.direction = x.direction.replace('_', '');
         x.field = (x.field in properties) ? properties[x.field]() : x.field;
 
@@ -197,10 +201,12 @@ const _createMangoFieldsTranspiler = ({properties, includeDBFields = [], exclude
         }
         return acc;
       }, {});
-
   };
+
   const _complexProperties = _extractObjectProperties();
+
   const _validateFields = (fields) => ((fields.length) ? _.uniq(fields) :  (DEFAULT_DB_FIELDS || []));
+
   const _includeBaseFields = (fields) => {
     return includeDBFields.reduce((sum, inc) => {
       if (fields.indexOf(inc) === -1) {
@@ -261,15 +267,15 @@ const _createDocumentFieldsTranspiler = ({fields}) => {
  * @param {*} param0
  */
 function _createMapper(modelName, {baseFilter = {}, baseFields = [], propertyMap = {}, operatorMap = DEFAULT_OPERATOR_MAP, arrayOperatorMap = DEFAULT_ARRAY_OPERATOR_MAP, relationMap = {}} = {}) {
-  const _operatorMapper = _compileOperatorMap(operatorMap);
-  const _arrayOperatorMapper = _compileOperatorMap(arrayOperatorMap);
-  const _propertyMapper = _compilePropertyMap(propertyMap);
-  const _fieldMapper = _compileFieldMap(propertyMap);
-  const _mangoSelectorTranspiler = _createMangoSelectorTranspiler({properties: _propertyMapper, operators: _operatorMapper, arrayOperators: _arrayOperatorMapper});
-  const _mangoSortTranspiler = _createMangoSortTranspiler({properties: _propertyMapper});
-  const _mangoFieldsTranspiler = _createMangoFieldsTranspiler({properties: _propertyMapper, includeDBFields: baseFields, excludeFields: Object.keys(relationMap)});
+  const _operatorMapper           = _compileOperatorMap(operatorMap);
+  const _arrayOperatorMapper      = _compileOperatorMap(arrayOperatorMap);
+  const _propertyMapper           = _compilePropertyMap(propertyMap);
+  const _fieldMapper              = _compileFieldMap(propertyMap);
+  const _mangoSelectorTranspiler  = _createMangoSelectorTranspiler({properties: _propertyMapper, operators: _operatorMapper, arrayOperators: _arrayOperatorMapper});
+  const _mangoSortTranspiler      = _createMangoSortTranspiler({properties: _propertyMapper});
+  const _mangoFieldsTranspiler    = _createMangoFieldsTranspiler({properties: _propertyMapper, includeDBFields: baseFields, excludeFields: Object.keys(relationMap)});
   const _documentFieldsTranspiler = _createDocumentFieldsTranspiler({fields: _fieldMapper});
-  const _relationKeys = Object.keys(relationMap);
+  const _relationKeys             = Object.keys(relationMap);
 
   const _getMangoQuery = ({filter = {}, skip = 0, limit = DEFAULT_DB_LIMIT, sort = [], fields = []} = {}, includeAll = true) => {
     let query = {
@@ -293,9 +299,9 @@ function _createMapper(modelName, {baseFilter = {}, baseFields = [], propertyMap
     return query;
   };
 
-  const _getPropertiesFromFields = (doc) => _documentFieldsTranspiler(doc);
-  const _getRelationMap = () => Object.assign({}, relationMap || {});
-  const _getIdentifierField = () => {
+  const _getPropertiesFromFields  = (doc) => _documentFieldsTranspiler(doc);
+  const _getRelationMap           = () => Object.assign({}, relationMap || {});
+  const _getIdentifierField       = () => {
     if (_.isFunction(_propertyMapper['id'])) {
       return _propertyMapper['id']();
     }
@@ -310,14 +316,14 @@ function _createMapper(modelName, {baseFilter = {}, baseFields = [], propertyMap
   };
 
   return {
-    getQuery: _getMangoQuery,
-    getPropertyMapper: () => _propertyMapper,
-    getOperatorMapper: () => _operatorMapper,
-    getArrayOperatorMapper: () => _arrayOperatorMapper,
-    getPropertiesFromFields: _getPropertiesFromFields,
-    getRelationMap: _getRelationMap,
-    getIdentifierField: _getIdentifierField,
-    getIdentifierProperty: _getIdentifierProperty
+    getQuery:                 _getMangoQuery,
+    getPropertyMapper:        () => _propertyMapper,
+    getOperatorMapper:        () => _operatorMapper,
+    getArrayOperatorMapper:   () => _arrayOperatorMapper,
+    getPropertiesFromFields:  _getPropertiesFromFields,
+    getRelationMap:           _getRelationMap,
+    getIdentifierField:       _getIdentifierField,
+    getIdentifierProperty:    _getIdentifierProperty
   };
 };
 

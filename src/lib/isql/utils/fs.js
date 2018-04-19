@@ -3,20 +3,36 @@ var glob = Promise.promisify(require('glob'));
 var readFile = Promise.promisify(require('fs').readFile);
 var path = require('path');
 
+/**
+ * Loads the file of the given path as a text file.
+ *
+ * @param   {string}  file  The file path to load.
+ * @returns {Promise}       Resolves with the contents (string) of the file.
+ */
 function _fileLoader(file) {
-//  console.log('loading: ' , path.basename(file));
   return readFile(file, 'utf-8');
 }
 
+/**
+ * Loads the file of the given path as a nodejs module. Used for javascript mime types.
+ *
+ * @param   {string}  file  The file path to load.
+ * @returns {Promise}       Resolves the exported value of the module.
+ */
 function _moduleLoader(file) {
   try {
-//    console.log('requiring: ' , path.basename(file));
     return Promise.resolve(require(file).default);
   } catch (e) {
     return Promise.reject(e);
   }
 }
 
+/**
+ * Returns the appropriate file loader for the given mime type.
+ *
+ * @param   {string}    format  The mime type.
+ * @returns {function}          The loader function.
+ */
 function _loaderFor(format = 'text/plain') {
   switch(format) {
     case 'javascript':
@@ -30,14 +46,32 @@ function _loaderFor(format = 'text/plain') {
   }
 }
 
+/**
+ * Parses given data as JSON.
+ *
+ * @param   {string} data The data to parse.
+ * @returns {object}      An object representation of JSON.
+ */
 function _parseJSON(data) {
   return JSON.parse(data || '{}');
 }
 
+/**
+ * Dummy parser. Just returns the given data.
+ *
+ * @param   {string} data The data to parse.
+ * @returns {string}      The given data.
+ */
 function _parseNone(data) {
   return data || '';
 }
 
+/**
+ * Returns the appropriate parser for the given mime type.
+ *
+ * @param   {string}    format  The mime type.
+ * @returns {function}          The parser function.
+ */
 function _parserFor(format) {
   switch(format) {
     case 'application/json':
@@ -49,6 +83,14 @@ function _parserFor(format) {
   }
 }
 
+/**
+ * Load and parse files in the given directory.
+ *
+ * @param {string}    fsPath  The directory path.
+ * @param {string}    format  The mime type of the file.
+ *
+ * @returns {Promise}         Resolves an array of parsed data (objects).
+ */
 function getDirectoryFiles(fsPath, format = 'text/plain') {
   let loader = _loaderFor(format);
   let parser = _parserFor(format);

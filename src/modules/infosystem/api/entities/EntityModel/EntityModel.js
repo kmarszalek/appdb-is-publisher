@@ -11,7 +11,6 @@ import {
   DEFAULT_OPERATOR_MAP
 } from './EntityDefaults';
 
-
 const _errorMandatoryField = (msg) => {
   return () => {
     throw new Error(msg);
@@ -68,6 +67,7 @@ const _createModel = (
 
   const _postProcessFieldNames = _.keys(postProcessFields).filter(p => _.isFunction(postProcessFields[p]));
 
+  //Dummy. For future use.
   const _postDocumentFetch = (doc) => {
     return doc;
   };
@@ -81,6 +81,12 @@ const _createModel = (
     }, doc);
   }
 
+  /**
+   * Transforms a DB document to a model object
+   *
+   * @param   {object} doc  DB document.
+   * @returns {object}      Model object.
+   */
   const _exportDocument = (doc) => {
     if (doc === null || doc.data === null) {
       return null;
@@ -88,16 +94,30 @@ const _createModel = (
     return _postDocumentFetch(_mapper.getPropertiesFromFields(_postProcessFields(doc)));
   };
 
+  /**
+   * Returns a list of model objects based on the given model query.
+   *
+   * @param   {object}    query                         Model query.
+   * @param   {object}    query.filter                  Model filter.
+   * @param   {number}    query.skip                    Model skip(offset) entries.
+   * @param   {number}    query.limit                   Model limit results.
+   * @param   {object[]}  query.sort                    Array of sort property objects.
+   * @param   {object[]}  query.fields                  Array of properties to retrieve.
+   * @param   {boolean}   query.includeTotalCount       Optional. Retrieve the total count the query can return. If true, it performs two queries, one for the paged data and one for the count and will impact performance. Default false.
+   * @param   {boolean}   query.translateProperties     Optional. Translate db fields to model properties. Default true.
+   * @param   {boolean}   query.wrapItemsToCollection   Optional. Wrap list as a collection object (includes paging information, count etc), else it just returns the model object list. Default true.
+   * @param   {object}    context                       Request context.
+   *
+   * @returns {Promise}                                 Resolves the model object collection.
+   */
   const fetchMany = async ({filter = {}, skip, limit, sort = [], fields = [], includeTotalCount = false,translateProperties = true, wrapItemsToCollection= true} = DEFAULT_MODEL_FINDMANY_ARGUMENTS, context) => {
     let query = _mapper.getQuery({filter, limit, skip, sort, fields});
-    //console.log(`[${name}] FIND MANY ` + JSON.stringify(filter));
-    //console.log(`[${name}] QUERY MANY ` + JSON.stringify(query));
     let execQueries = await Promise.all([
       _db().findMany(query, context),
       ((includeTotalCount && wrapItemsToCollection) ? _db().findCount(query, context) : Promise.resolve(null))
     ]).then(vals => {
       return Promise.resolve({
-        docs: (vals[0] || []).map((translateProperties) ? _exportDocument : (doc)=>doc),
+        docs: (vals[0] || []).map((translateProperties) ? _exportDocument : (doc) => doc),
         totalCount: vals[1]
       });
     });
@@ -117,48 +137,138 @@ const _createModel = (
     });
   }
 
+  /**
+   * Returns the first model object from the given query
+   *
+   * NOTE: It uses the ExecutionEngine, so if the filter contains references
+   * accross documents, it will perform joins on the application level.
+   *
+   * @param   {object}    query                         Model query.
+   * @param   {object}    query.filter                  Model filter.
+   * @param   {object[]}  query.fields                  Array of properties to retrieve.
+   * @param   {boolean}   query.translateProperties     Optional. Translate db fields to model properties. Default true.
+   * @param   {object}    context                       Request context.
+   *
+   * @returns {Promise}                                 Resolves the model object collection.
+   */
   const findOne = ({filter = {}, fields = DEFAULT_DB_FIELDS, translateProperties = true} = DEFAULT_MODEL_FINDONE_ARGUMENTS, context) => {
     let query = _mapper.getQuery({filter, limit: 1, skip: 0, fields});
     return _db().findOne(query, context).then(doc => ((translateProperties) ? _exportDocument(doc) : doc));
   }
 
+  /**
+   * Returns a list of model objects based on the given model query.
+   *
+   * NOTE: It uses the ExecutionEngine, so if the filter contains references
+   * accross documents, it will perform joins on the application level.
+   *
+   * @param   {object}    query                         Model query.
+   * @param   {object}    query.filter                  Model filter.
+   * @param   {number}    query.skip                    Model skip(offset) entries.
+   * @param   {number}    query.limit                   Model limit results.
+   * @param   {object[]}  query.sort                    Array of sort property objects.
+   * @param   {object[]}  query.fields                  Array of properties to retrieve.
+   * @param   {boolean}   query.includeTotalCount       Optional. Retrieve the total count the query can return. If true, it performs two queries, one for the paged data and one for the count and will impact performance. Default false.
+   * @param   {boolean}   query.translateProperties     Optional. Translate db fields to model properties. Default true.
+   * @param   {boolean}   query.wrapItemsToCollection   Optional. Wrap list as a collection object (includes paging information, count etc), else it just returns the model object list. Default true.
+   * @param   {number}    query.nestedLevel             Optional. Used from ExecutionEngine to track down the documents join level. Default 0
+   * @param   {object}    context                       Request context.
+   *
+   * @returns {Promise}                                 Resolves the model object collection.
+   */
   const findMany = ({filter = {}, skip, limit, sort = [], fields = [], includeTotalCount = false, translateProperties = true, wrapItemsToCollection = true, nestedLevel = 0} = DEFAULT_MODEL_FINDMANY_ARGUMENTS, context) => {
-    /*if (_execEngine.needsPlanning(filter) === false) {
-      return _findMany({filter, skip, limit, sort, fields, includeTotalCount, translateProperties}, context);
-    }*/
-
     return _execEngine.executeQuery({filter, skip, limit, sort, fields, includeTotalCount, translateProperties, wrapItemsToCollection, nestedLevel}, context);
   }
 
+  /**
+   * Return a model object with the given ID.
+   *
+   * @param   {string}  id        DB document id.
+   * @param   {object}  context   Request context.
+   *
+   * @returns {Promise}           Resolves model object.
+   */
   const getById = (id, context) => {
     return _db().getById(id, context).then(doc => Promise.resolve(_exportDocument(doc)));
   };
 
+  /**
+   * Get count based on given filter.
+   *
+   * @param {object} query          Model query.
+   * @param {object} query.filter   Module filter query.
+   * @param {object} context        Request context.
+   *
+   * @returns {Promise}             Resolves count.
+   */
   const getCount = ({filter = {}} = DEFAULT_MODEL_FINDONE_ARGUMENTS, context) => {
     let query = _mapper.getQuery({filter, fields: ['id']});
 
     return _db().findCount(query, context);
   }
 
+  /**
+   * Checks if given query filter correspond to only one document.
+   *
+   * @param {object} query          Model query.
+   * @param {object} query.filter   Module filter query.
+   * @param {object} context        Request context.
+   *
+   * @returns {Promise}             Resolves boolean.
+   */
   const hasOneEntry = ({filter = {}} = DEFAULT_MODEL_FINDONE_ARGUMENTS, context) => {
     let query = _mapper.getQuery({filter, limit: 2, skip: 0, fields: ['id']});
     return _db().findCount(query, context).then(count => (count === 1));
   };
 
+  /**
+   * Checks if given query filter correspond to more than one documents.
+   *
+   * @param {object} query          Model query.
+   * @param {object} query.filter   Module filter query.
+   * @param {object} context        Request context.
+   *
+   * @returns {Promise}             Resolves count.
+   */
   const hasSomeEntries = ({filter = {}} = DEFAULT_MODEL_FINDONE_ARGUMENTS, context) => {
     let query = _mapper.getQuery({filter, limit: 2, skip: 0, fields: ['id']});
     return _db().findCount(query, context).then(count => (count > 1));
   };
 
+  /**
+   * Checks if given query filter correspond to one or more documents.
+   *
+   * @param {object} query          Model query.
+   * @param {object} query.filter   Module filter query.
+   * @param {object} context        Request context.
+   *
+   * @returns {Promise}             Resolves count.
+   */
   const hasAny = ({filter = {}} = DEFAULT_MODEL_FINDONE_ARGUMENTS, context) => {
     let query = _mapper.getQuery({filter, limit: 1, skip: 0, fields: ['id']});
     return _db().findCount(query, context).then(count => (count > 0));
   };
 
+  /**
+   * Checks if given query filter does not correspond to any document.
+   *
+   * @param {object} query          Model query.
+   * @param {object} query.filter   Module filter query.
+   * @param {object} context        Request context.
+   *
+   * @returns {Promise}             Resolves count.
+   */
   const hasNone = ({filter = {}} = DEFAULT_MODEL_FINDONE_ARGUMENTS, context) => {
     return !hasAny({filter}, comtext);
   };
 
+  /**
+   * Maps given DB document fields to Model properties.
+   *
+   * @param   {object[]} data List of DB documents.
+   *
+   * @returns {object[]}      List of Model objects.
+   */
   const _map = (data) => {
     data = data || [];
     data = Array.isArray(data) ? data : [data];
@@ -166,7 +276,13 @@ const _createModel = (
     return data.map(d => _exportDocument(d));
   };
 
-  const _mapOne = (data, preprocessFunc) => {
+  /**
+   * Maps one DB document fields to Model properties.
+   *
+   * @param   {object} data DB document.
+   * @returns {object}      Model object.
+   */
+  const _mapOne = (data) => {
     return _.first(_map(data)) || null;
   };
 
@@ -205,7 +321,8 @@ const _createModel = (
         response: null
       });
 
-      return preOps.reduce(//Call pre process operations sequencially
+      return preOps.reduce(
+          //Call pre process operations sequencially
           (acc, preOp) => acc.then(newCallArgs => preOp(...newCallArgs)),
           Promise.resolve(hookStorage('callArgs'))
         )

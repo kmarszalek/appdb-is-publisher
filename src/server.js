@@ -49,6 +49,56 @@ function miscRoutes(router) {
   return router;
 }
 
+const graphqlMiddleware_Headers = function(conf) {
+  return function(req, res, next) {
+    res.header('Access-Control-Allow-Credentials', true);
+    res.header('Access-Control-Allow-Headers', 'content-type, authorization, content-length, x-requested-with, accept, origin');
+    res.header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
+    res.header('Access-Control-Allow-Origin', '*');
+    if (req.method === 'OPTIONS') {
+      res.sendStatus(200);
+      res.end();
+    } else {
+      next();
+    }
+  };
+};
+const graphqlMiddleware_Metrics = function(conf) {
+  return function(req, res, next) {
+    let logger = conf.getLogger('graphql');
+    let md5 = require('crypto').createHash('md5').update(JSON.stringify(req.body) + (new Date()).getTime()).digest("hex");
+    req.md5Hash = md5;
+    req.statistics = {
+      startedAt: new Date(),
+      totalDBRequests: 0,
+      totalDBTime: 1,
+      totalDBTimeString: function() {
+        return '' + (this.totalDBTime / 1000) + ' seconds';
+      },
+      totalProcessTime: 1,
+      totalProcessTimeString: function() {
+        return '' + (this.totalProcessTime / 1000) + ' seconds';
+      },
+      totalRequestTime: function() {
+        return (this.startedAt.getTime() - (new Date()).getTime());
+      },
+      totalRequestTimeString: function() {
+        return '' + (this.totalRequestTime / 1000) + ' seconds';
+      }
+    };
+    console.log('\x1b[32m[GraphQL::' + md5 + ']\x1b[0m: Started request');
+    res.on('finish', function() {
+      let endedAt = new Date();
+      let diff =  (endedAt.getTime() - this.startedAt.getTime()) / 1000;
+      console.log('\x1b[32m[GraphQL::' + md5 + ']\x1b[0m: Ended request. Took \x1b[35m' + diff + '\x1b[0m seconds');
+    }.bind({startedAt: new Date()}));
+    next();
+  };
+}
+/**
+ * Initialize HTTP server. Setup routes to inner services
+ * @param {*} conf
+ */
 function _initServer(conf) {
   var app = express();
 
@@ -59,49 +109,8 @@ function _initServer(conf) {
     '/graphql',
     [
       bodyParser.json(),
-      function(req, res, next) {
-        res.header('Access-Control-Allow-Credentials', true);
-        res.header('Access-Control-Allow-Headers', 'content-type, authorization, content-length, x-requested-with, accept, origin');
-        res.header('Access-Control-Allow-Methods', 'POST, GET, OPTIONS')
-        res.header('Access-Control-Allow-Origin', '*');
-        if (req.method === 'OPTIONS') {
-          res.sendStatus(200);
-          res.end();
-        } else {
-          next();
-        }
-      },
-      function(req, res, next) {
-        let logger = conf.getLogger('graphql');
-        let md5 = require('crypto').createHash('md5').update(JSON.stringify(req.body) + (new Date()).getTime()).digest("hex");
-        req.md5Hash = md5;
-        req.statistics = {
-          startedAt: new Date(),
-          totalDBRequests: 0,
-          totalDBTime: 1,
-          totalDBTimeString: function() {
-            return '' + (this.totalDBTime / 1000) + ' seconds';
-          },
-          totalProcessTime: 1,
-          totalProcessTimeString: function() {
-            return '' + (this.totalProcessTime / 1000) + ' seconds';
-          },
-          totalRequestTime: function() {
-            return (this.startedAt.getTime() - (new Date()).getTime());
-          },
-          totalRequestTimeString: function() {
-            return '' + (this.totalRequestTime / 1000) + ' seconds';
-          }
-        };
-        //logger.log('info', 'GraphQL::' + md5 , 'Started request');
-        console.log('\x1b[32m[GraphQL::' + md5 + ']\x1b[0m: Started request');
-        res.on('finish', function() {
-          let endedAt = new Date();
-          let diff =  (endedAt.getTime() - this.startedAt.getTime()) / 1000;
-          console.log('\x1b[32m[GraphQL::' + md5 + ']\x1b[0m: Ended request. Took \x1b[35m' + diff + '\x1b[0m seconds');
-        }.bind({startedAt: new Date()}));
-        next();
-      }
+      graphqlMiddleware_Headers(conf),
+      graphqlMiddleware_Metrics(conf)
     ],
     graphqlExpress(req => {
       return {
@@ -114,19 +123,30 @@ function _initServer(conf) {
       }
     })
   );
-
+  //Setup Graphiql tool endpoint to perform graphql queries in the browser
   app.use('/tools/graphiql',graphiqlExpress({endpointURL: '/graphql', pretty: true }));
+
+  //Setup voyager tool endpoint to graphicaly display graphql schema in the browser
   app.use('/tools/voyager', voyagerExpress({ endpointUrl: '/graphql', displayOptions: {sortByAlphabet: true} }));
+
+  //Graphiql used to be a root route. Now is moved to /tools location. Redirect older external links.
   app.use('/graphiql', (req, res) => res.redirect(
     url.format({
       pathname: '/tools/graphiql',
       query: req.query
     })
   ));
+
+  // Setup a REST api interface on top of graphql
   app.use('/rest', restRouter(express.Router(), Configuration.getModuleConfiguration('infosystem.rest')));
+
+  // Setup a proxy to the CouchDB backend instance
   app.use('/couchdb', proxyRouter(express.Router(), Configuration.getModuleConfiguration('couchDBProxy'), 'couchdb'));
+
+  // Handle any other route
   app.use('*', miscRoutes(express.Router()));
 
+  //Start server. Listening to configured port.
   return new Promise((resolve, reject) => {
     app.listen(PORT, function() {
       console.log('HTTP server listening to port: ' + PORT);

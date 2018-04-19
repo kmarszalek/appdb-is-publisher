@@ -6,6 +6,13 @@ import SiteServiceStatus from './SiteServiceStatus';
 import SiteServiceDowntime from './SiteServiceDowntime';
 import SRVDowntime from './SRVDowntime';
 
+/**
+ * Initializes the entities supported by the information system.
+ *
+ * @param   {object} context  Information System API.
+ *
+ * @returns {object}          Information System Entities API.
+ */
 function _initEntities(context) {
   const _entities = {
     site: Site(context),

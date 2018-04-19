@@ -10,6 +10,18 @@ https.globalAgent.maxSockets = 300;
 
 const _connections = {};
 
+/**
+ * Initialize the storage access object.
+ *
+ * @param   {object} config             The access configuration.
+ * @param   {string} config.name        Name to give to the storage acccess. Usually same as accesed collection.
+ * @param   {string} config.url         Couchdb url endpoint.
+ * @param   {string} config.username    Couchdb account username.
+ * @param   {string} config.password    Couchdb account password.
+ * @param   {string} config.collection  Couchdb collection name.
+ *
+ * @returns {CouchDBAccess}             CouchDBAccess instance.
+ */
 function _initStorage({name, url = mandatoryFunctionParameter('url', 'CouchDBAccess::constructor'), username = '', password = '', collection = mandatoryFunctionParameter('collection', 'CouchDBAccess::constructor') }) {
   name = name  || md5(url, username, password, collection);
 

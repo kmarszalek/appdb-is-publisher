@@ -2,6 +2,13 @@ import winston from 'winston';
 import mkdirp from 'mkdirp';
 let _logger = null;
 
+/**
+ * Creates a winston based logger for usage from couchDBProxy.
+ *
+ * @param   {object}  config  Configuration object, by default from config.js(modules.couchDBProxy).
+ *
+ * @returns {object}          A winston logger instance.
+ */
 export const createLogger = (config) => {
   if (!_logger) {
     mkdirp.sync(config.logpath);

@@ -1,5 +1,8 @@
 import _ from 'lodash';
 
+/**
+ * Handles a unique task lifecycle. To be used from UniqueTaskRegistry.
+ */
 class UniqueTask {
   constructor({taskId, taskCaller, onTaskEnded, cacheResponseTime = 0}) {
     this._id = _.trim(_.isPlainObject(taskId) ? JSON.stringify(taskId) : taskId);

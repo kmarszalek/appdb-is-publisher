@@ -18,6 +18,18 @@ const _allowedMangoProps = [
   'sort'
 ];
 
+/**
+ * Normalizes given mango query arguments.
+ *
+ * @param {object}      args            Mango query arguments.
+ * @param {object}      args.selector   Mango filter object.
+ * @param {number}      args.limit      Limit query results.
+ * @param {number}      args.skip       Query offset.
+ * @param {string[]}    args.fields     Array if document fields to return.
+ * @param {object[]}    args.sort       Array of sorting results.
+ *
+ * @returns {object}                    Normalized mango query object.
+ */
 function normalizeListArgs(args) {
   let normArgs = Object.assign({
     selector: {},
@@ -46,7 +58,7 @@ function normalizeListArgs(args) {
     delete normArgs.fields;
   }
 
-  //Clean invalid properties
+  //Clear invalid properties
   Object.keys(normArgs).forEach(k => {
     if (_allowedMangoProps.indexOf(k) === -1) {
       delete normArgs[k];
@@ -56,6 +68,17 @@ function normalizeListArgs(args) {
   return normArgs;
 }
 
+/**
+ * Get only the document data and omit the metadata section.
+ *
+ * NOTE: IsCollector stores each documents with two sections.
+ * The info section that contains the actual data and the metadata section
+ * that conatins information avout the data harvest and references
+ * to other other document types.
+ *
+ * @param   {object} doc  Couchdb document object.
+ * @returns {object}
+ */
 function getInfoResult(doc) {
   doc = doc || {};
 
@@ -78,13 +101,31 @@ function errorLogger(title, message, context) {
   console.log('\x1b[37m\x1b[41m[ERROR]\x1b[0m\x1b[34m[CouchDBAccess' + md5 + '::' + title + ']\x1b[0m: ' + message);
 }
 
+/**
+ * Provides mechanism to access information of a CouchDB endpoint
+ * produced by the IsCollector process
+ */
 class CouchDBAccess {
+  /**
+   * Constuctor.
+   *
+   * @param {object} db     A couchdb connection. Most likely a promisified instance from "nano" package.
+   * @param {string} name   Connection name. Usually the name of the accessed couchdb collection.
+   */
   constructor(db, name) {
     this._db  = db;
     this._name = name;
     this._taskRegistry = new UniqueTaskRegistry(this._name, {cacheResponseTime: 10000});
   }
 
+  /**
+   * Get a named query task.
+   *
+   * @param {string} name   Query operation (get, findAsync, findCount etc)
+   * @param {object} query  A mango query to be performed.
+   *
+   * @returns {Promise}     Resolves the query results
+   */
   queryTask(name, query) {
     var func =this._db[name];
     var id = this._name + '::' + name + '(' + (_.isPlainObject(query) ? JSON.stringify(query) : query) + ')';
@@ -92,6 +133,17 @@ class CouchDBAccess {
     return this._taskRegistry.register(id, function __queryTaskCaller__() { return func(query); });
   }
 
+  /**
+   * Returns a cached DB api for a given context to decrease resource consumption and improve performance.
+   *
+   * NOTE: This cache layer is created to be used for queries of the same request context.
+   * If for example a user requests (eg REST API request) information that resolves to multiple queries,
+   * this layer ensures that already retrieved information won't be requested again from the backend
+   * couch db instance.
+   *
+   * @param   {object} context  The context to attache the cached DB api
+   * @returns {object}          Cached DB api (provides operations findOne, findMany, findCount and getById)
+   */
   _cacheDb(context) {
     let _db = this;
     if (!context.filterLoader) {
@@ -111,6 +163,14 @@ class CouchDBAccess {
     }
   }
 
+  /**
+   * Returns the first document for the given mango query.
+   *
+   * @param   {object} args     Mango query.
+   * @param   {object} context  Request context.
+   *
+   * @returns {Promise}         Resolves a CouchDB document
+   */
   _findOne(args, context) {
     let query = normalizeListArgs(args);
     let queryTask = null;
@@ -137,10 +197,26 @@ class CouchDBAccess {
     });
   }
 
+  /**
+   * [CACHED] Returns the first document for the given mango query.
+   *
+   * @param   {object} args     Mango query.
+   * @param   {object} context  Request context.
+   *
+   * @returns {Promise}         Resolves a CouchDB document
+   */
   findOne(args, context) {
     return this._cacheDb(context).findOne(args);
   }
 
+  /**
+   * Returns the count for the given query.
+   *
+   * @param   {object} args     Mango query.
+   * @param   {object} context  Request context.
+   *
+   * @returns {Promise}         Resolves the count (number)
+   */
   _findCount(args, context) {
     let query = normalizeListArgs(args);
 
@@ -162,10 +238,26 @@ class CouchDBAccess {
     });
   }
 
+  /**
+   * [CACHED] Returns the count for the given query.
+   *
+   * @param   {object} args     Mango query.
+   * @param   {object} context  Request context.
+   *
+   * @returns {Promise}         Resolves the count (number)
+   */
   findCount(args, context) {
     return this._cacheDb(context).findCount(args);
   }
 
+  /**
+   * Returns the documents for the given query.
+   *
+   * @param   {object} args     Mango query.
+   * @param   {object} context  Request context.
+   *
+   * @returns {Promise}         Resolves the list of documents.
+   */
   _findMany(args, context) {
     let query = normalizeListArgs(args);
 
@@ -183,10 +275,27 @@ class CouchDBAccess {
     });
   }
 
+  /**
+   * [CACHED] Returns the documents for the given query.
+   *
+   * @param   {object} args     Mango query.
+   * @param   {object} context  Request context.
+   *
+   * @returns {Promise}         Resolves the list of documents.
+   */
   findMany(args, context) {
     return this._cacheDb(context).findMany(args);
   }
 
+  /**
+   * Returns a list of IDs for the qiven query.
+   *
+   * @param   {object} args         Mango query.
+   * @param   {object} context      Request context.
+   * @param   {string} useIdField   Optional. The document field to return as ID.
+   *
+   * @returns {Promise}             Resolves a list of document IDs
+   */
   getIds(args, context, useIdField = '_id') {
     let query = normalizeListArgs(args);
 
@@ -209,6 +318,14 @@ class CouchDBAccess {
     });
   }
 
+  /**
+   * Returns a document for the qiven document ID.
+   *
+   * @param   {string} id           CouchDB document _id.
+   * @param   {object} context      Request context.
+   *
+   * @returns {Promise}             Resolves a document object.
+   */
   _getById(id, context) {
     return this.queryTask('getAsync', id).catch(err => {
         switch(err.message) {
@@ -219,6 +336,14 @@ class CouchDBAccess {
     });
   }
 
+  /**
+   * [CACHED] Returns a document for the qiven document ID.
+   *
+   * @param   {string} id           CouchDB document _id.
+   * @param   {object} context      Request context.
+   *
+   * @returns {Promise}             Resolves a document object.
+   */
   getById(id, context) {
     return this._cacheDb(context).getById(id);
   }

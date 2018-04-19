@@ -5,7 +5,14 @@ function taskCompletionHandler(uniqTask) {
   delete this._registry[id];
 }
 
-export default class UniqueTaskRegistry {
+/**
+ * Creates and handles tasks. Ensures that only one task is executed for the given id.
+ * If a new task is registered and there is already one with the same id running, then
+ * the registry will return the existing one and not create a new one.
+ *
+ * NOTE: This is used for not creating dublicate query requests to the backend.
+ */
+class UniqueTaskRegistry {
   constructor(name, {cacheResponseTime = 0} = {cacheResponseTime: 0}) {
     this._name = name;
     this._registry = {};
@@ -14,7 +21,16 @@ export default class UniqueTaskRegistry {
       cacheResponseTime: cacheResponseTime
     };
   }
-
+  /**
+   * Register, start and return a subscription handler for a new task.
+   * If there is already a same task running, it returns the subscription
+   * handler of the existing one.
+   *
+   * @param   {string}    taskId      A unique identifier for the task. Usually an MD5 hash.
+   * @param   {function}  taskCaller  The function that executes the given task.
+   *
+   * @returns {Promise}               Resolves with the task result.
+   */
   register(taskId, taskCaller) {
     let task = new UniqueTask({
       taskId, taskCaller,
@@ -30,3 +46,5 @@ export default class UniqueTaskRegistry {
     return this._registry[id].subscribe();
   }
 }
+
+export default UniqueTaskRegistry;

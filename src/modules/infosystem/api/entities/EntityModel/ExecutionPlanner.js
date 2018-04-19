@@ -32,21 +32,33 @@ function getNormalizedRelationMap(mapper) {
   return res;
 }
 
+/**
+ *
+ * @param {*} param0
+ */
 function _createExecutionPlanner({modelName, mapper}) {
-  const relationMap = getNormalizedRelationMap(mapper);//.getRelationMap();
+  const relationMap = getNormalizedRelationMap(mapper);
   const _relationKeys = _.keys(relationMap);
 
   const _needsPlanning = (filter) => {
     return _seperateFilterRelations(filter).hasExternal;
   };
 
+  /**
+   * Optimization to reduce filtering if external referenced fields are already present
+   * in the internal model.(To be used by _seperateFilterRelations)
+   *
+   * Add filtering to root entity for shared fields
+   * and remove them from external entity filtering.
+   * If no external filtering is left, remove it all together.
+   * eg. In a siteservice filter in the site.name does not need to be filtered
+   * as an external site entity since this information is already contained
+   * in the siteservice itself.
+   *
+   * @param   {object} res
+   * @returns {object}
+   */
   const _optimizeSharedFields = (res) => {
-    // OPTIMIZATION: Add filtering to root entity for shared fields
-    // and remove them from extrnal entity filtering.
-    // If no external filtering is left, remove it all together.
-    // eg. In a siteservice filtetin the site.name does not need to be filtered
-    // as an external site entity since this information is already contained
-    // in the siteservice itself.
     if (res.hasExternal === true) {
       res.external = _.reduce(res.external, (acc, filterVal, filterKey) => {
         let rel = relationMap[filterKey] || {};
@@ -89,6 +101,12 @@ function _createExecutionPlanner({modelName, mapper}) {
     return res;
   };
 
+  /**
+   * Seperate which filter keys reference fields of external models.
+   *
+   * @param   {object} filter Model filter
+   * @returns {object}        Object containing external and internal filter expressions.
+   */
   const _seperateFilterRelations = (filter) => {
     let res =  _.reduce(filter, (acc, filterVal, filterKey) => {
       if (_relationKeys.indexOf(filterKey) > -1) {
@@ -111,6 +129,12 @@ function _createExecutionPlanner({modelName, mapper}) {
     return res;
   }
 
+  /**
+   * Create a query description.
+   *
+   * @param   {object} param0
+   * @returns {object}
+   */
   const _createQueryDescription = ({
     name = modelName,
     stepType = EXECUTION_PLAN_STEP_TYPE.INIT,
@@ -151,6 +175,24 @@ function _createExecutionPlanner({modelName, mapper}) {
     return descr;
   };
 
+  /**
+   * Create an execution plan for the given query.
+   *
+   * If the query filter does not reference other document
+   * types it will not perform any extra steps. The description
+   * is meant to be used by the execution engine.
+   *
+   * @param   {object}    query                         Model query.
+   * @param   {object}    query.filter                  Optional. Model filter. Default {}.
+   * @param   {number}    query.skip                    Optional. Model skip(offset) entries. Default 0.
+   * @param   {number}    query.limit                   Optional. Model limit results. Default DEFAULT_DB_LIMIT.
+   * @param   {object[]}  query.sort                    Optional. Array of sort property objects. Default [].
+   * @param   {object[]}  query.fields                  Optional. Array of properties to retrieve. Default [].
+   * @param   {number}    query.nestedLevel             Optional. Used from ExecutionEngine to track down the documents join level. Default 0
+   * @param   {object}    context                       Request context.
+   *
+   * @returns {object}                                  Execution plan.
+   */
   const _createQueryPlan = ({filter = {}, skip = 0, limit = DEFAULT_DB_LIMIT, sort = [], fields = [], nestedLevel = 0} = {}, context) => {
     let sepFilter = _seperateFilterRelations(filter);
     let queryDescriptions = [];
@@ -162,11 +204,13 @@ function _createExecutionPlanner({modelName, mapper}) {
       ];
     }
 
+    //Collect all of the ID fields needed to perform the queries
     primaryKeys = _.reduce(relationMap, (acc, val, key) => {
       acc = acc.concat(_.keys((val || {}).keys || {}));
       return _.uniq(acc);
     }, primaryKeys);
 
+    //Create first query to execute
     let init = _createQueryDescription({
       stepType: EXECUTION_PLAN_STEP_TYPE.INIT,
       operationType: EXECUTION_PLAN_OPERATION_TYPE.NONE,
@@ -176,9 +220,11 @@ function _createExecutionPlanner({modelName, mapper}) {
       identifierProperty: mapper.getIdentifierProperty()
     });
 
+    //Generate external queries desciptions
     let maps = _.reduce(sepFilter.external, (acc, val, key) => {
       let rmap = relationMap[key] || {};
       let rmodelName = rmap.name;
+      //Retrieve only the related identifiers from the query
       let fields = _.uniq(['id'].concat(_.values(rmap.keys)));
       let descr = _createQueryDescription({
         name: rmodelName,
@@ -195,6 +241,7 @@ function _createExecutionPlanner({modelName, mapper}) {
       return acc;
     }, []);
 
+    //Create final result reduction description
     let reduce = _createQueryDescription({
       name: modelName,
       stepType: EXECUTION_PLAN_STEP_TYPE.REDUCE,

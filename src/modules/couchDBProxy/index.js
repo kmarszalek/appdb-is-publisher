@@ -6,7 +6,16 @@ import _ from 'lodash';
 import mkdirp from 'mkdirp';
 import createLogger from './logger';
 
-export const expressRouter = function (router, config, routerPath = '') {
+/**
+ * Creates an express router that filters and proxies requests to the backend CouchDB instance.
+ *
+ * @param   {object} router       Express router under which this proxy occurs.
+ * @param   {object} config       Configuration object for this router. By default from config.js(modules.couchDBProxy)
+ * @param   {string} routerPath   Optional. Sets the root path to be used for path rewrites.
+ *
+ * @returns {object}              Express router object.
+ */
+export const expressRouter = function _expressRouter(router, config, routerPath = '') {
   var logger = createLogger(config);
   // proxy middleware options
   var options = {
@@ -43,7 +52,6 @@ export const expressRouter = function (router, config, routerPath = '') {
       proxyReq.setHeader( 'content-type', 'application/json' );
       proxyReq.setHeader( 'content-length', strBody.length );
       proxyReq.write(strBody);
-//    proxyReq.end();
 
       logger.info('['+ip+']', req.method + ' ' + proxyReq.path + ' ' + strBody);
     }
