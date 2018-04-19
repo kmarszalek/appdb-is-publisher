@@ -11,7 +11,7 @@ npm install
 
 ## Configuration
 
-In order to properly configure the IS Publisher, create a the following file from THE root folder:
+In order to properly configure the IS Publisher, create the following file from the root folder:
 ```sh
 ./config/instance.config.js
 ```
