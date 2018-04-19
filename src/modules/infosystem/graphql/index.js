@@ -3,7 +3,14 @@ import { makeExecutableSchema } from 'graphql-tools';
 import {getDirectoryFiles} from './../../../lib/isql/utils/fs';
 import {resolve} from 'path';
 
-async function _init(configuration) {
+/**
+ * Initialize and generate GraphQL executable schema
+ * based on the type definitions in ./schema/*.graphql files
+ * and the resolvers in ./resolvers/*.js folders.
+ *
+ * @returns {object}  GraphQL module API.
+ */
+async function _init() {
   let typeDefs = await getDirectoryFiles(__dirname + '/schema/*.graphql', 'text/plain');
   let resolveDefs = await getDirectoryFiles(__dirname + '/resolvers/*.js', 'application/javascript');
   let resolvers = resolveDefs.reduce((sum, def) => merge(sum, def), {});

@@ -5,6 +5,14 @@ const getIndent= (level, spaces = DEFAULT_INDENT_SPACES)  => {
   return _.times(level * spaces, _.constant(' ')).join('');
 };
 
+/**
+ * Transforms a REST API query filter string to a GraphQL filter argument.
+ *
+ * @param   {string} filter   REST Api filter string.
+ * @param   {number} level    Set by function itself to generate correct identation.
+ *
+ * @returns {object}          GraphQL filter object.
+ */
 export const filterToGraphQL = (filter, level = 0) => {
   let itemCount = 0;
 
@@ -42,6 +50,12 @@ export const filterToGraphQL = (filter, level = 0) => {
   }, getIndent(level) + '{\n') + getIndent(level) + '\n}';
 };
 
+/**
+ * Transforms a REST API query filter string to a GraphQL filter argument.
+ *
+ * @param   {string}  filter  REST Api filter string.
+ * @returns {Promise}         Resolves GraphQL filter object.
+ */
 export const asyncFilterToGraphQL = (filter) => {
   return new Promise((resolve, reject) => {
     try {
@@ -52,8 +66,21 @@ export const asyncFilterToGraphQL = (filter) => {
   });
 }
 
+/**
+ * Creates fucntion that extracts a section of an object based on the given path.
+ * The path is a dot seperated string to point to the object property.
+ * The function can also wrap the return value with an object with a key defined
+ * by appending the word 'as' followed by the key alias. Eg if given the path 'site.name as sitename'
+ * the function will return an object {'sitename': 'a site name'} instead of just the string 'a site name'.
+ *
+ * @param   {string}    path            Path to object property.
+ * @param   {object}    defaultResult   Optional. Default return value if path does not resolve anything.
+ *
+ * @returns {function}                  Extraction function.
+ */
 export const resultHandlerByPath = (path, defaultResult = {data: null}) => {
   let alias = _.trim(path).split(' as ');
+
   if (alias.length > 1) {
     path = _.trim(alias[0]);
     alias = _.trim(alias[1]);
@@ -63,13 +90,25 @@ export const resultHandlerByPath = (path, defaultResult = {data: null}) => {
 
   return (doc) => {
     let result = _.get(doc, path, null);
+
     if (alias) {
       result = {[alias]: result};
     }
+
     return Promise.resolve(result || defaultResult);
   };
 };
 
+/**
+ * Array of available filter expressions (filter query string)
+ * To be used by parseFilterString function.
+ *
+ * @param {string}    name      The type filter expression.
+ * @param {RegExp}    expr      A regular expression to parse the expression.
+ * @param {string[]}  ops       Allows operations. Eg cannot perform ilike in an integer type expression.
+ * @param {function}  noop      Returns default operation in case it is omitted from expression.
+ * @param {function}  getValue  Parses value from expression
+ */
 const _FilterExpressions = [
   {
     name: 'text',
@@ -109,6 +148,13 @@ const _FilterExpressions = [
   }
 ];
 
+/**
+ * Parses a REST API filter query.
+ *
+ * @param   {string} query  The REST query filter  string
+ *
+ * @returns {object}        An object containing the filter object and/or an array of parser errors.
+ */
 export const parseFilterString = (query) => {
   if (_.isPlainObject(query)) {
     return {filter: query, errors: []};

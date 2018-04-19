@@ -28,6 +28,16 @@ const getResolverFor = (entityName, action) => {
   }
 };
 
+/**
+ * Get the graphql fields used for this query,
+ * and the totalCount if is requested and
+ * attach them to the resolver arguments.
+ *
+ * @param   {object} args Resolver arguments.
+ * @param   {object} ast  GraphQL query AST.
+ *
+ * @returns {object}      Resolver arguments with fields and/or totalCount.
+ */
 export const prepareCollectionResolverArgs = (args, ast) => {
   let collectionInfo = _.reduce(getCollectionFieldNames(ast), (acc, field) => {
     if (field === 'totalCount') {
@@ -45,6 +55,15 @@ export const prepareCollectionResolverArgs = (args, ast) => {
   return Object.assign({}, args, collectionInfo);
 }
 
+/**
+ * Get the graphql fields used for this query
+ * and attach them to the resolver arguments.
+ *
+ * @param   {object} args Resolver arguments.
+ * @param   {object} ast  GraphQL query AST.
+ *
+ * @returns {object}      Resolver arguments with fields.
+ */
 export const prepareItemResolverArgs = (args, ast) => {
   let itemInfo = _.reduce(getFieldNames(ast), (acc, field) => {
     acc.fields.push(field);
@@ -56,6 +75,18 @@ export const prepareItemResolverArgs = (args, ast) => {
   return Object.assign({}, args, itemInfo);
 };
 
+/**
+ * Create resolver function that makes specific Entity model calls.
+ *
+ * The api name consists of the entity name and optionally the action name
+ * seperated with a '#' character. Eg if we want to fetch the site of a siteService
+ * the api name should be 'siteService#getSite'
+ *
+ * @param   {string} api            Api command.
+ * @param   {string} defaultAction  Default api action. Default 'getAll'
+ *
+ * @returns {function}
+ */
 export const apiActionResolver = (api, defaultAction) => {
   let _api = _.transform((api || '').split('#'), (acc, val, index) => {
     switch(index) {
@@ -80,6 +111,13 @@ export const apiActionResolver = (api, defaultAction) => {
   };
 };
 
+/**
+ * Creates a api resolver function that returns an object array.
+ *
+ * @param   {string}    apiAction   Api command.
+ *
+ * @returns {function}              Resolver function.
+ */
 export const resolveArrayWith = (apiAction) => {
   let _apiCall = apiActionResolver(apiAction, 'getAll');
 
@@ -92,6 +130,13 @@ export const resolveArrayWith = (apiAction) => {
 
 };
 
+/**
+ * Creates a api resolver function that returns a collection.
+ *
+ * @param   {string}    apiAction   Api command.
+ *
+ * @returns {function}              Resolver function.
+ */
 export const resolveCollectionWith = (apiAction) => {
   let _apiCall = apiActionResolver(apiAction, 'getAll');
 
@@ -103,6 +148,13 @@ export const resolveCollectionWith = (apiAction) => {
   });
 };
 
+/**
+ * Creates a api resolver function that returns an object.
+ *
+ * @param   {string}    apiAction   Api command
+ *
+ * @returns {function}              Resolver function.
+ */
 export const resolveItemWith = (apiAction) => {
   let _apiCall = apiActionResolver(apiAction, 'getAll');
 
@@ -114,6 +166,14 @@ export const resolveItemWith = (apiAction) => {
   });
 };
 
+/**
+ * Creates a api resolver function that returns an property array.
+ *
+ * @param   {string}    apiAction   Api command.
+ * @param   {string}    path        An object path to map properties from resulting objects (dot seperated).
+ *
+ * @returns {function}              Resolver function.
+ */
 export const resolveMapArrayWith = (apiAction, path = '') => {
   let _apiCall = apiActionResolver(apiAction, 'getModel');
 
@@ -122,6 +182,15 @@ export const resolveMapArrayWith = (apiAction, path = '') => {
   };
 };
 
+/**
+ * Creates a api resolver function that returns a property
+ * from the resulting object based on the given path.
+ *
+ * @param   {string}    apiAction   Api command.
+ * @param   {string}    path        An object path to map properties from resulting object (dot seperated).
+ *
+ * @returns {function}              Resolver function.
+ */
 export const resolveMapDataWith = (apiAction, path = '') => {
   let _apiCall = apiActionResolver(apiAction, 'getModel');
 

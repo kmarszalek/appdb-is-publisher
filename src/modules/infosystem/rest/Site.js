@@ -77,6 +77,7 @@ services (skip: 0, limit: 100000) {
 export const getCallerByIdentifier = (id, onlyQuery = false) => {
   if (id.indexOf('gocdb:') === 0) {
     id = id.replace('gocdb:', '');
+
     if (onlyQuery) {
       return `pkey: "${id}"`;
     } else {
@@ -85,6 +86,7 @@ export const getCallerByIdentifier = (id, onlyQuery = false) => {
 
   } else if (id.indexOf('name:') === 0) {
     id = id.replace('name:', '');
+
     if (onlyQuery) {
       return `name: {eq: "${id}"}`;
     }else {

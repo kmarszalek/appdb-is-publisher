@@ -2,7 +2,9 @@ import Configuration from '../../../lib/isql/Configuration';
 import _ from 'lodash';
 import {join} from 'path';
 
-
+/**
+ * Generate graphql endpoint to connect to based on existing configuration.
+ */
 export default function getGraphQLEndpoint() {
   let targetUrl = Configuration.getModuleConfiguration('infosystem.rest.graphQLUrl', 'local');
 
