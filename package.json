@@ -1,7 +1,7 @@
 {
   "name": "ispublisher",
-  "version": "0.0.1",
-  "description": "",
+  "version": "1.0.0",
+  "description": "Provides access interaces to information system backend",
   "main": "src/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -15,7 +15,7 @@
   "devDependencies": {
     "babel-cli": "^6.26.0",
     "babel-plugin-transform-object-rest-spread": "^6.26.0",
-    "babel-preset-env": "^1.6.0",
+    "babel-preset-env": "^1.6.1",
     "babel-register": "^6.26.0"
   },
   "dependencies": {

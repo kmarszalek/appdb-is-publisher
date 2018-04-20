@@ -59,12 +59,17 @@ const _createModel = (
     dbConnection      = _errorMandatoryField('[InfoSystem:api:entities:createModel] Must give DB connection object'),
   } = {}
 ) => {
+
+  //Initializa Entity Model Mapper instance for this model.
   const _mapper = EntityMapper.create(name, {baseFilter, baseFields, propertyMap, operatorMap, arrayOperatorMap, relationMap});
 
+  //CouchDB client getter.
   const _db = (_.isFunction(dbConnection)) ? dbConnection : () => dbConnection;
 
+  //Initialize Execution Engine instance for this model.
   const _execEngine = ExecutionEngine.create({modelName: name, dbConnection: _db, mapper: _mapper, relationMap});
 
+  //Gather post process functions declared in the model definition.
   const _postProcessFieldNames = _.keys(postProcessFields).filter(p => _.isFunction(postProcessFields[p]));
 
   //Dummy. For future use.
@@ -72,6 +77,13 @@ const _createModel = (
     return doc;
   };
 
+  /**
+   * Apply post processing of document fields as customly defined in the model definition.
+   *
+   * @param   {object} doc  CouchDB document object.
+   *
+   * @returns {object}      Processed CouchDB document object.
+   */
   const _postProcessFields = (doc) => {
     return _.reduce(_postProcessFieldNames, (acc, name) => {
       if (_.has(doc, name)) {
@@ -91,6 +103,7 @@ const _createModel = (
     if (doc === null || doc.data === null) {
       return null;
     }
+
     return _postDocumentFetch(_mapper.getPropertiesFromFields(_postProcessFields(doc)));
   };
 
@@ -153,6 +166,7 @@ const _createModel = (
    */
   const findOne = ({filter = {}, fields = DEFAULT_DB_FIELDS, translateProperties = true} = DEFAULT_MODEL_FINDONE_ARGUMENTS, context) => {
     let query = _mapper.getQuery({filter, limit: 1, skip: 0, fields});
+
     return _db().findOne(query, context).then(doc => ((translateProperties) ? _exportDocument(doc) : doc));
   }
 
@@ -356,6 +370,7 @@ const _createModel = (
     });
   };
 
+  //Setup Entity Model public api functions.
   const _modelOps = {
     findMany: findMany,
     findOne: findOne,
@@ -372,8 +387,10 @@ const _createModel = (
     mapOne: _mapOne
   };
 
+  //Apply model hooks.
   _applyHooks();
 
+  //Every Entity Model needs to be registered for other parts of the framework can look it up. (eg ExecutionPlanner ExecutionEngine, etc)
   EntityModelRegistry.register(name, _modelOps);
 
   return _modelOps;

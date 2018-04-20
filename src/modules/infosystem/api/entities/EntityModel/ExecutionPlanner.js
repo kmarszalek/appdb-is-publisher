@@ -14,6 +14,13 @@ import {
 } from './ExecutionPlanEnums';
 import EntityModelRegistry from './EntityModelRegistry';
 
+/**
+ * Normalize relation map of given entity model mapper.
+ *
+ * @param   {object} mapper Entity model mapper instance.
+ *
+ * @returns {object}        Entity model mapper instance.
+ */
 function getNormalizedRelationMap(mapper) {
   let res = {};
 
@@ -33,13 +40,25 @@ function getNormalizedRelationMap(mapper) {
 }
 
 /**
+ * Create an execution planner for given entity model name and entity mapper instance.
  *
- * @param {*} param0
+ * @param   {object} args             Arguments object.
+ * @param   {object} args.modelName   Entity model name.
+ * @param   {object} args.mapper      Entity model mapper.
+ *
+ * @returns {object}                  Execution Planner Api.
  */
 function _createExecutionPlanner({modelName, mapper}) {
   const relationMap = getNormalizedRelationMap(mapper);
   const _relationKeys = _.keys(relationMap);
 
+  /**
+   * Checks if given query filter needs multiple queries
+   * to be performed, thus needs planning.
+   *
+   * @param   {object}  filter  Entity model query filter.
+   * @returns {boolean}         True, if given filter need planning.
+   */
   const _needsPlanning = (filter) => {
     return _seperateFilterRelations(filter).hasExternal;
   };
@@ -130,10 +149,20 @@ function _createExecutionPlanner({modelName, mapper}) {
   }
 
   /**
-   * Create a query description.
+   * Create a query description object.
    *
-   * @param   {object} param0
-   * @returns {object}
+   * @param   {object} args                     Arguments object.
+   * @param   {string} args.name                Entity model name.
+   * @param   {string} args.stepType            Enumeration of EXECUTION_PLAN_STEP_TYPE.
+   * @param   {string} args.operationType       Enumeration of EXECUTION_PLAN_OPERATION_TYPE.
+   * @param   {string} args.operateOn           Enumeration of EXECUTION_PLAN_OPERATE_ON.
+   * @param   {object} args.query               Entity model query object.
+   * @param   {object} args.relations           Key/foreign key of entity model relation to other model.
+   * @param   {object} args.relationType        Entity model relation type to other model (belongsTo, hasMany, hasOne etx)
+   * @param   {string} args.identifier          DB document identifier field name.
+   * @param   {string} args.identifierProperty  Entity model identifier property name.
+   *
+   * @returns {object}                          Query step description object.
    */
   const _createQueryDescription = ({
     name = modelName,
@@ -268,6 +297,7 @@ function _createExecutionPlanner({modelName, mapper}) {
     };
   };
 
+  //Return mapper api public functions.
   return {
     createPlan: _createQueryPlan,
     needsPlanning: _needsPlanning

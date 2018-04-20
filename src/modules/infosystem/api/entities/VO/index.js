@@ -89,7 +89,7 @@ function _initVO(context) {
     return _VOModel.findMany(Object.assign(args || {} ,{
       filter: Object.assign({name: {ne: null}}, _.get(args, 'filter', {name: {ne: null}})),
       fields: ['name']
-    }), context);//.then(uniqVOs(args));
+    }), context);
   };
 
   VO.getSitesForVOName = ({root, args, context}) => context.api('site').getAll({
@@ -113,22 +113,22 @@ function _initVO(context) {
   VO.getRelatedVOs = ({root, args, context}) => _VOModel.findMany({
     filter: relationalFilter(root, args, context),
     fields: ['name']
-  }, context);//.then(uniqVOs(args));
+  }, context);
 
   VO.getSiteRelatedVOs = ({root, args, context}) => _VOModel.findMany(Object.assign(args || {}, {
     filter: relationalFilter(root, args, context, 'Site'),
     fields: ['name']
-  }), context);//.then(uniqVOs(args));
+  }), context);
 
   VO.getSiteServiceRelatedVOs = ({root, args, context}) => _VOModel.findMany({
     filter: relationalFilter(root, args, context, 'SiteService'),
     fields: ['name']
-  }, context);//.then(uniqVOs(args));
+  }, context);
 
   VO.getSiteServiceImageRelatedVOs = ({root, args, context}) => _VOModel.findMany({
     filter: relationalFilter(root, args, context, 'SiteServiceImage'),
     fields: ['name']
-  }, context);//.then(uniqVOs(args));
+  }, context);
 
   VO.getModel = () => {
     return _VOModel;

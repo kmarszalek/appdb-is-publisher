@@ -11,13 +11,13 @@ function _initSiteServiceDowntime(context) {
 
   SiteServiceDowntime.getAll = ({root, args, context}) => _SiteServiceDowntimeModel.findMany(args, context);
 
-  SiteServiceDowntime.getBySiteName = (name, fields, context) => _SiteServiceDowntimeModel.findMany( getArgsWithBaseFilter({'site.name': name}, {fields: fields}), context );
+  SiteServiceDowntime.getBySiteName = (name, fields, context) => _SiteServiceDowntimeModel.findMany( getArgsWithBaseFilter({'site.name': name}, {fields: fields}), context);
 
-  SiteServiceDowntime.getBySiteServiceEndpointPKey = (pkey, fields, context) => _SiteServiceDowntimeModel.findMany( getArgsWithBaseFilter({'service.endpointPKey': pkey}, {fields: fields}), context );
+  SiteServiceDowntime.getBySiteServiceEndpointPKey = (pkey, fields, context) => _SiteServiceDowntimeModel.findMany( getArgsWithBaseFilter({'service.endpointPKey': pkey}, {fields: fields}), context);
 
   SiteServiceDowntime.getSite = ({root, args, context}) => context.api('site').getByName(_.get(root, 'site.name'), args.fields, context);
 
-  SiteServiceDowntime.getSiteService = ({root, args, context}) =>context.api('siteService').getByEndpointPKey(_.get(root, 'service.endpointPKey'), args.fields, context);
+  SiteServiceDowntime.getSiteService = ({root, args, context}) => context.api('siteService').getByEndpointPKey(_.get(root, 'service.endpointPKey'), args.fields, context);
 
   SiteServiceDowntime.getModel = () => _SiteServiceDowntimeModel;
 

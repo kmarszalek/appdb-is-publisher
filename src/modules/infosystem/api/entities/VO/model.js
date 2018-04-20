@@ -10,16 +10,16 @@ function VOImageModel(context) {
     baseFields          : ['id', 'info.SiteName', 'info.SitePKey', 'info.SiteEndpointPKey', 'info.ImageVoVmiInstanceVO'],
     excludeFields       : ['sites', 'services'],
     propertyMap         : {
-      'id'                                                : 'info.ImageVoVmiInstanceVO',
-      'sites.name'                                        : 'info.SiteName',
-      'sites.pkey'                                        : 'info.SitePKey',
-      'services.endpointPKey'                             : 'info.SiteEndpointPKey',
-      'name'                                              : 'info.ImageVoVmiInstanceVO',
-      'hash'                                              : 'info.hash'
+      'id'                    : 'info.ImageVoVmiInstanceVO',
+      'sites.name'            : 'info.SiteName',
+      'sites.pkey'            : 'info.SitePKey',
+      'services.endpointPKey' : 'info.SiteEndpointPKey',
+      'name'                  : 'info.ImageVoVmiInstanceVO',
+      'hash'                  : 'info.hash'
     },
     relationMap         : {
-      'sites'            : { name: 'Site', relationType: 'hasMany', relationOn: {key: 'info.SitePKey', foreignKey: 'info.SitePKey' }, sharedFields: {'name': 'site.name', 'pkey': 'site.pkey'}},
-      'services'         : { name: 'SiteService', relationType: 'manyToMany', relationOn: {key: 'info.SiteEndpointPKey', foreignKey:  'info.SiteEndpointPKey'}, sharedFields: {'service.endpointPKey': 'service.endpointPKey'}},
+      'sites'           : { name: 'Site', relationType: 'hasMany', relationOn: {key: 'info.SitePKey', foreignKey: 'info.SitePKey' }, sharedFields: {'name': 'site.name', 'pkey': 'site.pkey'}},
+      'services'        : { name: 'SiteService', relationType: 'manyToMany', relationOn: {key: 'info.SiteEndpointPKey', foreignKey:  'info.SiteEndpointPKey'}, sharedFields: {'service.endpointPKey': 'service.endpointPKey'}},
       'templates'       : { name: 'SiteServiceTemplate', relationType: 'manyToMany', relationOn: {key: 'info.SiteEndpointPKey', foreignKey:  'info.SiteEndpointPKey'}},
       'images'          : { name: 'SiteServiceImages', relationType: 'manyToMany', relationOn: {key: 'info.ImageVoVmiInstanceVO', foreignKey: 'info.ImageVoVmiInstanceVO'}}
     },

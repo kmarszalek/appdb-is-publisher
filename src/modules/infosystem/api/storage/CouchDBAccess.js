@@ -39,13 +39,20 @@ function normalizeListArgs(args) {
     sort: []
   }, args || {});
 
+  //Ensure selector attribute is not null
   normArgs.selector = Object.assign({}, args.selector || args.filter || {});
+
+  //Ensure limit attribute is a number
   normArgs.limit = parseInt(args.limit) || 1000;
+
+  //Ensure skip attribute is a number
   normArgs.skip = parseInt(args.skip) || 0;
 
+  //Ensure fields attribute is an array
   normArgs.fields = args.fields || [];
   normArgs.fields = Array.isArray(normArgs.fields) ? normArgs.fields : [normArgs.fields];
 
+  //Ensure sort attribute is an array
   normArgs.sort = args.sort || [];
   normArgs.sort = Array.isArray(normArgs.sort) ? normArgs.sort : [normArgs.sort];
   normArgs.sort = normArgs.sort.filter(v => !!v).map(v => ((_.isString(v)) ? {[v]: 'asc'} : v));

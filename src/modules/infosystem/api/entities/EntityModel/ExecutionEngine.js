@@ -332,6 +332,7 @@ function _createExecutionEngine({modelName, mapper}) {
     return execResults;
   }
 
+  //Return ExecutionEngine public api functions.
   return {
     needsPlanning: _execPlanner.needsPlanning,
     prepareQuery: _execPlanner.createPlan,
