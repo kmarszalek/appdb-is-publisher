@@ -110,7 +110,7 @@ pm2 start pm2.production.json
 
 ### GraphQL interface
 
-Provides a service endpoint to post [GraphQL](https://graphql.org/)queries. The service runs over HTTP via a single endpoint:
+Provides a service endpoint to post [GraphQL](https://graphql.org/) queries. The service runs over HTTP via a single endpoint:
 ```
 http://<ispublisher_hostname>/graphql
 ```
