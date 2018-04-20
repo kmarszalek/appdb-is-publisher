@@ -146,7 +146,7 @@ function _createExecutionEngine({modelName, mapper}) {
     return map.model.findMany(qq, map.context).then(results => {
       results = results || [];
       results = results.items || results;
-      logger(map.name + '.' + nestedLevel, 'MAPPED ' + results.length + ' ITEMS ' + JSON.stringify(qq.filter), map.context);
+      logger(map.name + '.' + nestedLevel, 'Mapped ' + results.length + ' items ', map.context);// + JSON.stringify(qq.filter), map.context);
       return Promise.resolve(results);
     });
   }
@@ -227,7 +227,8 @@ function _createExecutionEngine({modelName, mapper}) {
    * @returns {Promise}     Resolves plan results.
    */
   async function _executePlan(plan) {
-    logger(modelName + '.' + plan.level, 'START EXECUTION....', plan.context);
+    let logHeader = modelName+'.' + plan.level;
+    logger(logHeader, 'Start execution for query ' + JSON.stringify(plan.initialRequest.filter), plan.context);
     plan = _initializeExecutionPlan(plan);
 
     let rootData = null;
@@ -237,7 +238,7 @@ function _createExecutionEngine({modelName, mapper}) {
 
     //Check if plan has an init step and performs tit first
     if (plan.steps.init) {
-      logger(modelName+'.' + plan.level , 'PERFORM INIT STEP ' +  JSON.stringify(plan.steps.init.query), plan.context);
+      logger(logHeader , 'Performing init step ' +  JSON.stringify(plan.steps.init.query), plan.context);
 
       //Set extra result wrapping to false to improve performance
       plan.steps.init.query.translateProperties = false;
@@ -249,7 +250,7 @@ function _createExecutionEngine({modelName, mapper}) {
 
       //If nothing is fetched exit.
       if (rootData.length === 0) {
-        console.log('\x1b[36m[ExecutionEngine('+modelName+'.' + plan.level + ')]\x1b[0m: NOTHING RETURNED');
+        console.log('\x1b[36m[ExecutionEngine('+ logHeader + ')]\x1b[0m: Nothing returned');
         return getExecutionResults(plan);
       }
     }
@@ -258,7 +259,7 @@ function _createExecutionEngine({modelName, mapper}) {
 
     //Check if there are any further steps and execute them.
     if (plan.steps.maps.length > 0) {
-      logger(modelName + '.' + plan.level, 'PERFORM ' + plan.steps.maps.length  + ' MAP STEPS', plan.context);
+      logger(logHeader, 'Perform ' + plan.steps.maps.length  + ' map steps', plan.context);
 
       let mapPromises = (plan.steps.maps || []).map(m => {
         m = prepareStepMap(m, rootData);
@@ -284,7 +285,7 @@ function _createExecutionEngine({modelName, mapper}) {
         return sum;
       }, true);
 
-      logger(modelName + '.' + plan.level, 'MAP STEPS ENDED ' + (mapSuccess ? ' SUCCESSFULLY' : ' WITH NO RESULTS') , plan.context);
+      logger(logHeader, 'Map steps completed ' + (mapSuccess ? ' successfully' : ' with no results') , plan.context);
 
       //If none of them have any results exit.
       if (mapSuccess === false) {
@@ -297,7 +298,7 @@ function _createExecutionEngine({modelName, mapper}) {
       }
     }
 
-    logger(modelName + '.' + plan.level, 'REDUCTION DOWN TO ' + reducedData.length + ' ' + _.trim(modelName).toUpperCase() + ' ITEMS', plan.context);
+    logger(logHeader, 'Reduction down to ' + reducedData.length + ' ' + _.trim(modelName) + ' items', plan.context);
 
     let rootTotalCount = 0;
     let rootCollection = [];
@@ -327,7 +328,7 @@ function _createExecutionEngine({modelName, mapper}) {
     //Prepare the results for return.
     let execResults = getExecutionResults(plan, rootCollection, rootTotalCount);
 
-    logger(modelName + '.' + plan.level, 'PLAN FINISHED WITH ' + _.get(execResults, 'items', []).map(item => _.get(item, rootIdentifierProperty, JSON.stringify(item))).join(', '), plan.context);
+    logger(logHeader, 'Execution Plan finished. Matched with ' + _.get(execResults, 'items', []).length + ' items', plan.context);
 
     return execResults;
   }
