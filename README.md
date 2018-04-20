@@ -110,11 +110,7 @@ pm2 start pm2.production.json
 
 ### GraphQL interface
 
-Provides a  query service to
-
-[GraphQL](https://graphql.org/) is a query language for APIs and a server-side runtime, for executing queries.
-
-The service runs over HTTP via a single endpoint:
+Provides a service endpoint to post [GraphQL](https://graphql.org/)queries. The service runs over HTTP via a single endpoint:
 ```
 http://<ispublisher_hostname>/graphql
 ```
@@ -127,6 +123,8 @@ To visually inspect the information schema, the [voyager](https://github.com/API
 ```
 http://<ispublisher_hostname>/tools/voyager
 ```
+
+>It is suggested to use the aforementioned tools since they provide the data schema documentation and can guide you to write correct queries.
 
 ### REST API interface
 This service is build on top of graphql service to help users perform simple queries is case they cannot use the graphql language. The root path of this service is accessible at:
