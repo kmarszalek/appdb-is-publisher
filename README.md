@@ -105,3 +105,103 @@ For the production instance an extra step is required.
 npm run build
 pm2 start pm2.production.json
 ```
+
+## Usage
+
+### GraphQL interface
+
+Provides a  query service to
+
+[GraphQL](https://graphql.org/) is a query language for APIs and a server-side runtime, for executing queries.
+
+The service runs over HTTP via a single endpoint:
+```
+http://<ispublisher_hostname>/graphql
+```
+
+In order to help you build your queries or simply perform queries, the [graphiql](https://github.com/graphql/graphiql) UI tool is provided, at the following endpoint:
+```
+http://<ispublisher_hostname>/tools/graphiql
+```
+To visually inspect the information schema, the [voyager](https://github.com/APIs-guru/graphql-voyager)   web UI tool is also provided, at the following endpoint:
+```
+http://<ispublisher_hostname>/tools/voyager
+```
+
+### REST API interface
+This service is build on top of graphql service to help users perform simple queries is case they cannot use the graphql language. The root path of this service is accessible at:
+```
+http://<ispublisher_hostname>/rest
+```
+The specific endpoint responds with a json describing all of the available REST resources in order to get started.
+
+It should be noted that many complex query operations performed in graphql, such as quering array elements, or matching numeric ranges etc,do not apply to this interface. The same goes for the resource structure, which is predefined in the REST API case.
+
+#### Paging with the REST API
+Paging is achieved with the use of **limit** and **skip** query string fields. Eg. Retrieve the first 10 sites:
+```
+http://<ispublisher_hostname>/rest/sites?limit=10?skip=0
+```
+
+### Filtering with the REST API
+Filtering is achieved by setting the **filter** query string field. It contains space seperated expressions in the following format:
+```
+  <property>[.<subproperty>][::<operation>]:<value>
+```
+
+| name | mandatory | description |
+| ---- | --------- | ----------- |
+| property | yes | The property of the resource |
+| subproperty | no | A nested property |
+| operation | no | A comparison operation. Defaults to **eq**(equals) |
+| value | yes | The value to match |
+
+>Properties and subproperties are case sensitive
+
+>Text values must be wrapped in double quotes
+
+>Boolean values take no operation and can be either **true** or **false**
+
+Operation value depends on the value type:
+
+| operation | value | description |
+| --------- | ----- | ----------- |
+| eq | text, number | Exact equal with value |
+| ne | text, number | Not equal with value |
+| like | text | Contains value. Can use "*". |
+| ilike | text | Case insensite. Contains value. Can use "*". |
+| nlike | text | Does not contain value. Can use "*" |
+| nilike | text | Case insensitive. Does not contain value. Can use "*" |
+| gt | number | Greater than value |
+| ge | number | Greater than or equal to value |
+| lt | number | Less than value |
+| le | number | Less then or equal to value |
+
+
+#### Examples
+Find any site from _"Spain"_:
+```
+/rest/sites?filter=country:"Spain"
+```
+
+Find any site with name that contains the word _"meta"_ we write our filter like:
+```
+/rest/sites?filter=name::ilike:"*meta*"
+```
+
+Combine the above queries:
+```
+/rest/sites?filter=country:"Spain" name::ilike:"*meta*"
+```
+
+Find any site with a service not in _production_:
+```
+/rest/sites?filter=services.isInProduction:false
+```
+
+## CouchDB interface
+
+This interface is a read only proxy to the backend CouchDB instance that can be used by couchdb client tools. It can be accessed from the following endpoint:
+```
+http://<ispublisher_hostname>/couchdb
+```
