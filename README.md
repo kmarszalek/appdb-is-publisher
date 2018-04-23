@@ -1,6 +1,6 @@
 # IS Publisher
 
-> Provides access interfaces to information system backend.
+> Provides access to information system backend.
 
 ## Installation
 
