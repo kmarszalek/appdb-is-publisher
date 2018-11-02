@@ -12,7 +12,7 @@ let _logger = null;
 export const createLogger = (config) => {
   if (!_logger) {
     mkdirp.sync(config.logpath);
-    _logger = new (winston.Logger)({
+    _logger = winston.createLogger({
       transports: [
         new winston.transports.File({ filename: config.logpath + '/debug.log', json: false })
       ],

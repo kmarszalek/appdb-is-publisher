@@ -5,7 +5,7 @@ import path from 'path';
 
 const _logLevels = ['error', 'warn', 'info', 'verbose', 'debug', 'silly'];
 
-const _catchAllLogger = new (winston.Logger)({
+const _catchAllLogger = winston.createLogger({
   levels: winston.config.npm,
   transports: [
     new winston.transports.Console()
@@ -35,7 +35,7 @@ const _createLogger = (name, conf = { error: null, warn: null, info: null, verbo
     return acc;
   }, []);
 
-  return new (winston.Logger)({
+  return winston.createLogger({
     levels: winston.config.npm,
     transports: loggerTransports,
     exitOnError: false
