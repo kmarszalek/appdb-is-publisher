@@ -1,7 +1,6 @@
 import _ from 'lodash';
 import {query, TEMPLATE_COLLECTION_HEADER} from './restModel';
 import {filterToGraphQL, asyncFilterToGraphQL, resultHandlerByPath} from './utils';
-import gql from 'graphql-tag';
 import {TEMPLATE_SITE_SERVICE_DETAILS_FIELDS}  from './SiteService';
 import {TEMPLATE_SITE_DETAILS_FIELDS} from './Site';
 
@@ -58,7 +57,7 @@ export const getCallerByIdentifier = (id, onlyQuery = false) => {
 export const getByIdentifier = (id) => {
   let caller = getCallerByIdentifier(id);
 
-  return query(gql`{
+  return query(`{
     data: ${caller} {
       ${TEMPLATE_SITE_SERVICE_STATUS_DETAILS_FIELDS}
     }
@@ -67,7 +66,7 @@ export const getByIdentifier = (id) => {
 
 export const getSite = (id) => {
   let caller = getCallerByIdentifier(id);
-  return query(gql`{
+  return query(`{
     data: ${caller} {
       id
       site {
@@ -80,7 +79,7 @@ export const getSite = (id) => {
 export const getSiteService = (id, imageId) => {
   let caller = getCallerByIdentifier(id);
 
-  return query(gql`{
+  return query(`{
     data: ${caller} {
       id
       siteService{
@@ -92,7 +91,7 @@ export const getSiteService = (id, imageId) => {
 
 export const getAll = ({filter = {}, limit = 0, skip = 0} = {filter:{}, limit: 0, skip: 0}) => {
   return asyncFilterToGraphQL(filter).then(flt => {
-    return query(gql`
+    return query(`
       {
         data: siteServiceStatuses(filter: ${flt}, limit: ${limit}, skip: ${skip}) {
           ${TEMPLATE_COLLECTION_HEADER}

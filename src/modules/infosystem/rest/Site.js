@@ -1,6 +1,5 @@
 import _ from 'lodash';
 import {query, TEMPLATE_COLLECTION_HEADER} from './restModel';
-import gql from 'graphql-tag';
 import {filterToGraphQL, asyncFilterToGraphQL,resultHandlerByPath} from './utils';
 import {TEMPLATE_SITE_SERVICE_ITEM_FIELDS, TEMPLATE_SITE_SERVICE_DETAILS_FIELDS} from './SiteService';
 import {TEMPLATE_SITE_SERVICE_IMAGE_COLLECTION_FIELDS, TEMPLATE_SITE_SERVICE_IMAGE_DETAILS_FIELDS} from './SiteServiceImage';
@@ -103,7 +102,7 @@ export const getCallerByIdentifier = (id, onlyQuery = false) => {
 
 export const getByIdentifier = (id) => {
   let caller = getCallerByIdentifier(id);
-  return query(gql`{
+  return query(`{
     data: ${caller} {
       ${TEMPLATE_SITE_DETAILS_FIELDS}
     }
@@ -120,7 +119,7 @@ export const getAllSiteServices = (siteId, {filter = {}, limit = 0, skip = 0} = 
           ${TEMPLATE_SITE_SERVICE_ITEM_FIELDS}
         }
       }`;
-    return query(gql`{
+    return query(`{
       data: ${siteCaller} {
         id
         ${servicesQuery}
@@ -141,7 +140,7 @@ export const getSiteService = (siteId, serviceId) => {
       ${TEMPLATE_SITE_SERVICE_DETAILS_FIELDS}
     }
   }`;
-  return query(gql`{
+  return query(`{
     data: ${siteCaller} {
       id
       ${servicesQuery}
@@ -166,7 +165,7 @@ export const getSiteServiceImage = (siteId, serviceId, imageId) => {
     }
   }`;
 
-  return query(gql`{
+  return query(`{
     data: ${siteCaller} {
       id
       ${servicesQuery}
@@ -192,7 +191,7 @@ export const getAllSiteServiceImages = (siteId, serviceId, {filter = {}, limit =
       }
     }`;
 
-    return query(gql`{
+    return query(`{
       data: ${siteCaller} {
         id
         ${servicesQuery}
@@ -217,7 +216,7 @@ export const getSiteServiceTemplate = (siteId, serviceId, templateId) => {
       ${templatesQuery}
     }
   }`;
-  return query(gql`{
+  return query(`{
     data: ${siteCaller} {
       id
       ${servicesQuery}
@@ -243,7 +242,7 @@ export const getAllSiteServiceTemplates = (siteId, serviceId, {filter = {}, limi
       }
     }`;
 
-    return query(gql`{
+    return query(`{
       data: ${siteCaller} {
         id
         ${servicesQuery}
@@ -254,7 +253,7 @@ export const getAllSiteServiceTemplates = (siteId, serviceId, {filter = {}, limi
 
 export const getAll = ({filter = {}, limit = 0, skip = 0} = {filter:{}, limit: 0, skip: 0}) => {
   return asyncFilterToGraphQL(filter).then(flt => {
-    return query(gql`
+    return query(`
       {
         data: sites(filter: ${flt}, limit: ${limit}, skip: ${skip}) {
           totalCount

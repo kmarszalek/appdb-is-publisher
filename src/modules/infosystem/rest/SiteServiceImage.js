@@ -1,7 +1,6 @@
 import _ from 'lodash';
 import {query, TEMPLATE_COLLECTION_HEADER} from './restModel';
 import {filterToGraphQL, asyncFilterToGraphQL, resultHandlerByPath} from './utils';
-import gql from 'graphql-tag';
 import {TEMPLATE_SITE_ITEM_FIELDS, TEMPLATE_SITE_DETAILS_FIELDS} from './Site';
 import {TEMPLATE_SITE_SERVICE_COLLECTION_FIELDS, TEMPLATE_SITE_SERVICE_DETAILS_FIELDS} from './SiteService';
 import {TEMPLATE_SITE_SERVICE_TEMPLATE_COLLECTION_FIELDS, TEMPLATE_SITE_SERVICE_TEMPLATE_DETAILS_FIELDS} from './SiteServiceTemplate';
@@ -55,7 +54,7 @@ export const getCallerByIdentifier = (id, onlyQuery = false) => {
 
 export const getAll = ({filter = {}, limit = 0, skip = 0} = {filter:{}, limit: 0, skip: 0}) => {
   return asyncFilterToGraphQL(filter).then(flt => {
-    return query(gql`
+    return query(`
       {
         data: siteServiceImages(filter: ${flt}, limit: ${limit}, skip: ${skip}) {
           ${TEMPLATE_COLLECTION_HEADER}
@@ -71,7 +70,7 @@ export const getAll = ({filter = {}, limit = 0, skip = 0} = {filter:{}, limit: 0
 export const getByIdentifier = (id) => {
   let caller = getCallerByIdentifier(id);
 
-  return query(gql`{
+  return query(`{
     data: ${caller} {
       ${TEMPLATE_SITE_SERVICE_IMAGE_DETAILS_FIELDS}
     }
@@ -80,7 +79,7 @@ export const getByIdentifier = (id) => {
 
 export const getSiteService = (imageId) => {
   let caller = getCallerByIdentifier(imageId);
-  return query(gql`{
+  return query(`{
     data: ${caller} {
       id
       service {
@@ -92,7 +91,7 @@ export const getSiteService = (imageId) => {
 
 export const getSite = (imageId) => {
   let caller = getCallerByIdentifier(imageId);
-  return query(gql`{
+  return query(`{
     data: ${caller} {
       id
       site {
@@ -113,7 +112,7 @@ export const getAllSiteServiceTemplates =   (imageId, {filter = {}, limit = 0, s
         }
       }
     `;
-    return query(gql`{
+    return query(`{
       data: ${caller} {
         id
         ${templatesQuery}
@@ -126,7 +125,7 @@ export const getSiteServiceTemplate = (imageId, templateId) => {
   let caller = getCallerByIdentifier(imageId);
   let templateQuery = SiteServiceTemplate.getCallerByIdentifier(templateId, true);
 
-  return query(gql`{
+  return query(`{
     data: ${caller} {
       id
       templates(filter: {${templateQuery}}, limit: 1, skip: 0) {

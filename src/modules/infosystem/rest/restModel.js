@@ -4,8 +4,6 @@ import getGraphQLEndpoint from './getGraphQLEndpoint';
 //Get GraphQL endpoint
 const _graphQLEndpoint = getGraphQLEndpoint();
 
-console.log('REST GRPAPHQL ENDPOINT', _graphQLEndpoint);
-
 //Create a GraphQL client
 export const client = new GraphQLClient(_graphQLEndpoint,{ headers: {}});
 
