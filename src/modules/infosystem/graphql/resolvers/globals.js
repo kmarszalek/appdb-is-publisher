@@ -1,5 +1,7 @@
+import {version} from '../../../../../package.json';
+
 export default {
   Query: {
-    version: () => '1.0.0'
+    version: () => version
   }
 }
