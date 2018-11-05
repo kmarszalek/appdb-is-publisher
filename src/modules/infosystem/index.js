@@ -18,7 +18,7 @@ async function _init() {
   return {
     getLogger: (name) => configuration.getLogger(name),
     getApi: (name) => _subModules.api.get(name),
-    getGraphQL: () => _subModules.graphql.getGraphQL()
+    getGraphQL: () => _subModules.graphql
   };
 }
 

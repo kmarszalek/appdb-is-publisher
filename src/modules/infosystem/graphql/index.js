@@ -14,10 +14,15 @@ async function _init() {
   let typeDefs = await getDirectoryFiles(__dirname + '/schema/*.graphql', 'text/plain');
   let resolveDefs = await getDirectoryFiles(__dirname + '/resolvers/*.js', 'application/javascript');
   let resolvers = resolveDefs.reduce((sum, def) => merge(sum, def), {});
-  let executableSchema = makeExecutableSchema({typeDefs, resolvers});
+  let executableSchema = null;
 
   return {
-    getGraphQL: () => executableSchema
+    getSchema: () => {
+      executableSchema = executableSchema || makeExecutableSchema({typeDefs, resolvers});
+      return executableSchema
+    },
+    getTypeDefs: () => typeDefs,
+    getResolvers: () => resolvers
   };
 }
 
