@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.2] - 2018-11-05
+### Changed
+- Update third party dependencies to their current version
+- Use package.json version value from graphql version resolver
+- Clean up unused code
+
 ## [1.3.1] - 2018-04-23
 ### Changed
 - Code revision and documentation
@@ -68,7 +74,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 - Added filter array operators (containsAll, icontainsAll, containsSome, icontainsSome, containsBetween)
 - Added new fields in SiteService, SiteServiceImage, SiteServiceTemplate in Graphql and REST interface
-- Added central logger 
+- Added central logger
 ### Changed
 - Set default production cluster to 4 process
 
