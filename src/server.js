@@ -2,16 +2,19 @@ import express from 'express';
 import url from 'url';
 import Configuration from './lib/isql/Configuration';
 import bodyParser from 'body-parser';
-import { graphqlExpress, graphiqlExpress } from 'apollo-server-express';
+import { ApolloServer } from 'apollo-server-express';
 import { express as voyagerExpress } from 'graphql-voyager/middleware';
+import graphiqlExpress from 'express-graphiql-middleware';
 import DataLoader from 'dataloader';
 import {serviceDescription as graphqlServiceDescription} from './modules/infosystem/graphql';
 import {expressRouter as restRouter, handleNoImlementation, handleUnknown, serviceDescription as restServiceDescription} from './modules/infosystem/rest';
 import {expressRouter as proxyRouter} from './modules/couchDBProxy';
 import http from 'http';
 import https from 'https';
+
 http.globalAgent.maxSockets = 2000;
 https.globalAgent.maxSockets = 2000;
+
 const PORT = Configuration.getServerConfiguration('http.port', 80);
 
 function createDataLoaders(api) {
@@ -63,10 +66,15 @@ const graphqlMiddleware_Headers = function(conf) {
     }
   };
 };
+
 const graphqlMiddleware_Metrics = function(conf) {
   return function(req, res, next) {
     let logger = conf.getLogger('graphql');
-    let md5 = require('crypto').createHash('md5').update(JSON.stringify(req.body) + (new Date()).getTime()).digest("hex");
+    let md5 = require('crypto')
+      .createHash('md5')
+      .update(JSON.stringify(req.body) + (new Date()).getTime())
+      .digest("hex");
+
     req.md5Hash = md5;
     req.statistics = {
       startedAt: new Date(),
@@ -94,40 +102,56 @@ const graphqlMiddleware_Metrics = function(conf) {
     }.bind({startedAt: new Date()}));
     next();
   };
-}
+};
+
 /**
  * Initialize HTTP server. Setup routes to inner services
  * @param {*} conf
  */
 function _initServer(conf) {
-  var app = express();
+  const GRAPHQL_ENTPOINT_PATH = '/graphql';
 
-  app.use(bodyParser.urlencoded({extended: true}));
-  app.use(bodyParser.json());
+  const app = express();
 
-  app.use(
-    '/graphql',
+  const graphQLConfig = conf.getGraphQL();
+
+  const graphQLServer = new ApolloServer({
+    schema: graphQLConfig.getSchema(),
+    context: ({ req }) => ({
+      api: conf.getApi,
+      request: req,
+      loaders: createDataLoaders(conf.getApi)
+    }),
+    introspection: true,
+    playground: {
+      endpoint: GRAPHQL_ENTPOINT_PATH,
+      theme: 'dark'
+    }
+  });
+
+  const graphQLEndpoint = app.use(
+    GRAPHQL_ENTPOINT_PATH,
     [
       bodyParser.json(),
       graphqlMiddleware_Headers(conf),
       graphqlMiddleware_Metrics(conf)
-    ],
-    graphqlExpress(req => {
-      return {
-        schema: conf.graphQLSchema,
-        context: {
-          api: conf.getApi,
-          request: req,
-          loaders: createDataLoaders(conf.getApi)
-        }
-      }
-    })
+    ]
   );
+
+  graphQLServer.applyMiddleware({
+    app: graphQLEndpoint,
+    path: GRAPHQL_ENTPOINT_PATH
+  });
+
+  app.use(bodyParser.urlencoded({extended: true}));
+  app.use(bodyParser.json());
+
   //Setup Graphiql tool endpoint to perform graphql queries in the browser
-  app.use('/tools/graphiql',graphiqlExpress({endpointURL: '/graphql', pretty: true }));
+  //app.use('/tools/graphiql',graphiqlExpress({endpointURL: '/graphql', pretty: true }));
+  app.get('/tools/graphiql', graphiqlExpress({ endpointURL: GRAPHQL_ENTPOINT_PATH, rewriteURL: true }));
 
   //Setup voyager tool endpoint to graphicaly display graphql schema in the browser
-  app.use('/tools/voyager', voyagerExpress({ endpointUrl: '/graphql', displayOptions: {sortByAlphabet: true} }));
+  app.use('/tools/voyager', voyagerExpress({ endpointUrl: GRAPHQL_ENTPOINT_PATH, displayOptions: {sortByAlphabet: true} }));
 
   //Graphiql used to be a root route. Now is moved to /tools location. Redirect older external links.
   app.use('/graphiql', (req, res) => res.redirect(

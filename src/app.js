@@ -18,7 +18,7 @@ async function _initApplication() {
     //Initialize HTTP server. Passing ispublisher sub services.
     let server = await HttpServer({
       getLogger: infoSystem.getLogger,
-      graphQLSchema: infoSystem.getGraphQL(),
+      getGraphQL: infoSystem.getGraphQL,
       getApi: infoSystem.getApi
     });
 
