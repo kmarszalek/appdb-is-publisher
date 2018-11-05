@@ -3,8 +3,10 @@ import md5 from './../../../../lib/isql/utils/md5';
 import CouchDBAccess from './CouchDBAccess';
 import nano from 'nano';
 import Promise from 'bluebird';
+
 var http = require('http');
 var https = require('https');
+
 http.globalAgent.maxSockets = 300;
 https.globalAgent.maxSockets = 300;
 

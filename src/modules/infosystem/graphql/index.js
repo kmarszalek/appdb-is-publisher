@@ -1,7 +1,6 @@
 import {merge} from 'lodash';
 import { makeExecutableSchema } from 'graphql-tools';
 import {getDirectoryFiles} from './../../../lib/isql/utils/fs';
-import {resolve} from 'path';
 
 /**
  * Initialize and generate GraphQL executable schema

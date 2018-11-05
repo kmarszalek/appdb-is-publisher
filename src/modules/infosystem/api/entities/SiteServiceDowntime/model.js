@@ -1,4 +1,5 @@
 import EntityModel from '../EntityModel';
+
 function SiteServiceDowntimeModel(context) {
   return EntityModel.create({
     name                : 'SiteServiceDowntime',

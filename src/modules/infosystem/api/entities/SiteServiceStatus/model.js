@@ -1,4 +1,5 @@
 import EntityModel from '../EntityModel';
+
 function SRVDowntimeModel(context) {
   return EntityModel.create({
     name                : 'SiteServiceStatus',

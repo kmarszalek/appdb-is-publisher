@@ -12,7 +12,6 @@ import {
   EXECUTION_PLAN_OPERATION_TYPE,
   EXECUTION_PLAN_OPERATE_ON
 } from './ExecutionPlanEnums';
-import EntityModelRegistry from './EntityModelRegistry';
 
 /**
  * Normalize relation map of given entity model mapper.

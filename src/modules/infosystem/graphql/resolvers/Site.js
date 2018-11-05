@@ -1,4 +1,4 @@
-import {resolveAs, prepareCollectionResolverArgs, prepareItemResolverArgs} from '../utils';
+import {resolveAs, prepareItemResolverArgs} from '../utils';
 
 const SiteResolver = {
   Query: {

@@ -1,4 +1,5 @@
 import EntityModel from '../EntityModel';
+
 function SiteServiceTemplateModel(context) {
   return EntityModel.create({
     name                : 'SiteServiceTemplate',

@@ -1,5 +1,4 @@
 import winston from 'winston';
-import mkdirp from 'mkdirp';
 import _ from 'lodash';
 import path from 'path';
 

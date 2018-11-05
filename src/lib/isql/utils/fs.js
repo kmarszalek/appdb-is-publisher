@@ -1,7 +1,6 @@
 var Promise = require('bluebird');
 var glob = Promise.promisify(require('glob'));
 var readFile = Promise.promisify(require('fs').readFile);
-var path = require('path');
 
 /**
  * Loads the file of the given path as a text file.

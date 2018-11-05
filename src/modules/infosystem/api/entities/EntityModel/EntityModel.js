@@ -3,7 +3,6 @@ import EntityModelRegistry from './EntityModelRegistry';
 import EntityMapper from './EntityMapper';
 import ExecutionEngine from './ExecutionEngine';
 import {
-  DEFAULT_DB_LIMIT,
   DEFAULT_DB_FIELDS,
   DEFAULT_MODEL_FINDMANY_ARGUMENTS,
   DEFAULT_MODEL_FINDONE_ARGUMENTS,
