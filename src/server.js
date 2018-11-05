@@ -122,11 +122,11 @@ function _initServer(conf) {
       request: req,
       loaders: createDataLoaders(conf.getApi)
     }),
-    introspection: true,
-    playground: {
-      endpoint: GRAPHQL_ENTPOINT_PATH,
-      theme: 'dark'
-    }
+    introspection: (process.env.NODE_ENV !== 'production'),
+    playground: (process.env.NODE_ENV === 'production') ? false : {
+        endpoint: GRAPHQL_ENTPOINT_PATH,
+        theme: 'dark'
+      }
   });
 
   const graphQLEndpoint = app.use(
