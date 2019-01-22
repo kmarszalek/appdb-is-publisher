@@ -17,6 +17,7 @@ const PORT = Configuration.getServerConfiguration('http.port', 80);
 function createDataLoaders(api) {
   return {
     'Site': new DataLoader(ids => api('site').getByIds(ids)),
+    'SiteAdditional': new DataLoader(ids => api('siteAdditional').getByIds(ids)),
     'SiteService': new DataLoader(ids => api('siteService').getByIds(ids)),
     'SiteServiceImage': new DataLoader(ids => api('siteServiceImage').getByIds(ids)),
     'SiteServiceTemplate': new DataLoader(ids => api('siteServiceTemplate').getByIds(ids))

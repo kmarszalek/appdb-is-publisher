@@ -1,4 +1,5 @@
 import Site from './Site';
+import SiteAdditional from './SiteAdditional';
 import SiteService from './SiteService';
 import SiteServiceImage from './SiteServiceImage';
 import SiteServiceTemplate from './SiteServiceTemplate';
@@ -16,6 +17,7 @@ import SRVDowntime from './SRVDowntime';
 function _initEntities(context) {
   const _entities = {
     site: Site(context),
+    siteAdditional: SiteAdditional(context),
     siteService: SiteService(context),
     siteServiceImage: SiteServiceImage(context),
     siteServiceTemplate: SiteServiceTemplate(context),

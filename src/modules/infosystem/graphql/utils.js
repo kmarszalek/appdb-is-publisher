@@ -106,7 +106,6 @@ export const apiActionResolver = (api, defaultAction) => {
 
   return ({root, args, context, info}) => {
     let entity = context.api(_api.entityName);
-
     return entity[_api.actionName].apply(entity, [{root, args, context, info}]);
   };
 };

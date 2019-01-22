@@ -1,0 +1,227 @@
+# Represents a Site in the information system
+# Each site may contain one or more services. If the site has at least one cloud service,
+# it may also contain VM images and cloud execution templates.
+type SiteAdditional {
+  # Local Inforation System Identifier
+  id: ID
+  # GocDB Site identifier (SitePKey@gocdb)
+  pkey: String
+  # Site name (SiteName@gocdb)
+  name: String
+  # Short version of site name (SiteShortName@gocdb)
+  shortName: String
+  # OfficiaL bame of site (SiteOfficialName@gocdb)
+  officialName: String
+  # Description of site (SiteDescription@gocdb)
+  description: String
+  # Site url in gocDB portal (SiteGocdbPortalUrl@gpcdb)
+  gocdbPortalUrl: String
+  # Site home url (SiteHomeUrl@gocdb)
+  homeUrl: String
+  # Site GIIS url (SiteGiisUrl@gocdb)
+  giisUrl: String
+  # Site country code (SiteCountryCode@gocdb)
+  countryCode: String
+  # Site country name (SiteCountry@gocdb)
+  country: String
+  # Site tier (SiteTier@gocdb)
+  tier: String
+  # Site sub grid (SiteSubgrid@gocdb)
+  subgrid: String
+  # Site roc (SiteRoc@gocdb)
+  roc: String
+  # Indcates if site is in procuction state (SiteProdInfrastructure@gocdb)
+  prodInfrastructure: String #SiteInfrastructureState
+  # Certification status of site (SiteCertStatus@gocdb)
+  certStatus: String #SiteCertificationStatus
+  # Timezone of site (SiteTimezone@gocdb)
+  timezone: String
+  # Site coordinates (latitude) (SiteLatitude@gocdb)
+  latitude: Float
+  # Site coordinates (longitude) (SiteLongitude@gocdb)
+  longitude: Float
+  # Site domain name (SiteDomainname@gocdb)
+  domainName: String
+  # Operational status of services of the current site reported by the argo.egi.eu service
+  serviceStatuses: [SiteServiceStatus]
+  # Scheduled/Unscheduled downtimes of the services of the current site registered at the gocdb.egi.eu service
+  serviceDowntimes: [SiteServiceDowntime]
+  # Reported donwtimes of valious services of the current site
+  SRVDowntimes: [SRVDowntime]
+  # Information system data hash value
+  hash: String
+  # A collection of services provided by this site
+  services(filter: SiteService_Filter, limit: Int, skip: Int, sort: [SiteService_Sort]): SiteServiceCollection
+  # A collection of images provided by thr services of this site
+  images(filter: SiteServiceImage_Filter, limit: Int, skip: Int, sort: [SiteServiceImage_Sort]): SiteServiceImageCollection
+  # A collection of templates provided by the services of this site
+  templates(filter: SiteServiceTemplate_Filter, limit: Int, skip: Int, sort: [SiteServiceTemplate_Sort]): SiteServiceTemplateCollection
+  # EXTRA DATA
+  extraData: String
+}
+
+# Site filtering options to help query the site collection
+input SiteAdditional_Filter {
+  # Local Information System Identifier
+  id: FilterStringOperators
+  # GocDB Site identifier (SitePKey@gocdb)
+  pkey: FilterStringOperators
+  # Site name (SiteName@gocdb)
+  name: FilterStringOperators
+  # Short version of site name (SiteShortName@gocdb)
+  shortName: FilterStringOperators
+  # Officila bame of site (SiteOfficialName@gocdb)
+  officialName: FilterStringOperators
+  # Description of site (SiteDescription@gocdb)
+  description: FilterStringOperators
+  # Site url in gocDB portal (SiteGocdbPortalUrl@gpcdb)
+  gocdbPortalUrl: FilterStringOperators
+  # Site home url (SiteHomeUrl@gocdb)
+  homeUrl: FilterStringOperators
+  # Site GIIS url (SiteGiisUrl@gocdb)
+  giisUrl: FilterStringOperators
+  # Site country code (SiteCountryCode@gocdb)
+  countryCode: FilterStringOperators
+  # Site country name (SiteCountry@gocdb)
+  country: FilterStringOperators
+  # Site tier (SiteTier@gocdb)
+  tier: FilterStringOperators
+  # Site sub grid (SiteSubgrid@gocdb)
+  subgrid: FilterStringOperators
+  # Site roc (SiteRoc@gocdb)
+  roc: FilterStringOperators
+  # Indcates if site is in procuction state (SiteProdInfrastructure@gocdb)
+  prodInfrastructure: SiteInfrastructureState
+  # Certification status of site (SiteCertStatus@gocdb)
+  certStatus: SiteCertificationStatus
+  # Timezone of site (SiteTimezone@gocdb)
+  timezone: FilterStringOperators
+  # Site coordinates (latitude) (SiteLatitude@gocdb)
+  latitude: FilterFloatOperators
+  # Site coordinates (longitude) (SiteLongitude#gocdb)
+  longitude: FilterFloatOperators
+  # Site domain name (SiteDomainname@gocdb)
+  domainName: FilterStringOperators
+  # Information system data hash value
+  hash: String
+  # Filter by site service statuses (SiteServiceStatus@argo)
+  serviceStatuses: SiteServiceStatus_Filter
+  # Filter by site service downtimes (SiteServiceStatus@gocdb)
+  serviceDowntimes: SiteServiceDowntime_Filter
+  # Filter by site's services values
+  services: SiteService_Filter
+  # Filter by site's images values
+  images: SiteServiceImage_Filter
+  # Filter by site's templates values
+  templates: SiteServiceTemplate_Filter
+  #withImageCount: FilterIntegerOperators
+  #withTemplateCount: FilterIntegerOperators
+  #or: [Site_Filter]
+  #and: [Site_Filter]
+}
+
+# Sorting options for Site collection results
+enum SiteAdditional_Sort {
+  # Ascenting order by Local Inforation System Identifier
+  id_asc
+
+  # Ascenting order by GocDB Site identifier SitePKey@gocdb
+  ##pkey_asc
+  # Ascenting order by Site name SiteName@gocdb
+  ##name_asc
+  # Ascenting order by Short version of site name SiteShortName@gocdb
+  ##shortName_asc
+  # Ascenting order by Officila bame of site SiteOfficialName@gocdb
+  ##officialName_asc
+  # Ascenting order by Description of site SiteDescription@gocdb
+  ##description_asc
+  # Ascenting order by Site url in gocDB portal SiteGocdbPortalUrl@gpcdb
+  ##gocdbPortalUrl_asc
+  # Ascenting order by Site home url SiteHomeUrl@gocdb
+  ##homeUrl_asc
+  # Ascenting order by Site GIIS url SiteGiisUrl@gocdb
+  ##giisUrl_asc
+  # Ascenting order by Site country code SiteCountryCode@gocdb
+  ##countryCode_asc
+  # Ascenting order by Site country name SiteCountry@gocdb
+  ##country_asc
+  # Ascenting order by Site tier SiteTier@gocdb
+  ##tier_asc
+  # Ascenting order by Site sub grid SiteSubgrid@gocdb
+  ##subgrid_asc
+  # Ascenting order by Site roc SiteRoc@gocdb
+  ##roc_asc
+  # Ascenting order by Indcates if site is in procuction state SiteProdInfrastructure@gocdb
+  ##prodInfrastructure_asc
+  # Ascenting order by Certification status of site SiteCertStatus@gocdb
+  ##certStatus_asc
+  # Ascenting order by Timezone of site SiteTimezone@gocdb
+  ##timezone_asc
+  # Ascenting order by Site coordinates (latitude) SiteLatitude@gocdb
+  ##latitude_asc
+  # Ascenting order by Site coordinates (longitude) SiteLongitude#gocdb
+  ##longitude_asc
+  # Ascenting order by Site domain name SiteDomainname@gocdb
+  ##domainName_asc
+  # Ascenting order by Information system data hash value
+  ##hash_asc
+
+  # Descenting order by Local Inforation System Identifier
+  id_desc
+  # Descenting order by GocDB Site identifier SitePKey@gocdb
+  ##pkey_desc
+  # Descenting order by Site name SiteName@gocdb
+  ##name_desc
+  # Descenting order by Short version of site name SiteShortName@gocdb
+  ##shortName_desc
+  # Descenting order by Officila bame of site SiteOfficialName@gocdb
+  ##officialName_desc
+  # Descenting order by Description of site SiteDescription@gocdb
+  ##description_desc
+  # Descenting order by Site url in gocDB portal SiteGocdbPortalUrl@gpcdb
+  ##gocdbPortalUrl_desc
+  # Descenting order by Site home url SiteHomeUrl@gocdb
+  ##homeUrl_desc
+  # Descenting order by Site GIIS url SiteGiisUrl@gocdb
+  ##giisUrl_desc
+  # Descenting order by Site country code SiteCountryCode@gocdb
+  ##countryCode_desc
+  # Descenting order by Site country name SiteCountry@gocdb
+  ##country_desc
+  # Descenting order by Site tier SiteTier@gocdb
+  ##tier_desc
+  # Descenting order by Site sub grid SiteSubgrid@gocdb
+  ##subgrid_desc
+  # Descenting order by Site roc SiteRoc@gocdb
+  ##roc_desc
+  # Descenting order by Indcates if site is in procuction state SiteProdInfrastructure@gocdb
+  ##prodInfrastructure_desc
+  # Descenting order by Certification status of site SiteCertStatus@gocdb
+  ##certStatus_desc
+  # Descenting order by Timezone of site SiteTimezone@gocdb
+  ##timezone_desc
+  # Descenting order by Site coordinates (latitude) SiteLatitude@gocdb
+  ##latitude_desc
+  # Descenting order by Site coordinates (longitude) SiteLongitude#gocdb
+  ##longitude_desc
+  # Descenting order by Site domain name SiteDomainname@gocdb
+  ##domainName_desc
+  # Descenting order by Information system data hash value
+  ##hash_desc
+}
+
+type SiteAdditionalCollection {
+  totalCount: Int
+  count: Int
+  limit: Int
+  skip: Int
+  sort: [SiteAdditional_Sort]
+  items: [SiteAdditional]
+}
+
+extend type Query {
+  siteAdditionalById(id: ID!): SiteAdditional
+  siteAdditionalByGocDBPKey(id: String!): SiteAdditional
+  siteAdditionalByName(name: String!): SiteAdditional
+  siteAdditionals(filter: SiteAdditional_Filter, limit: Int, skip: Int, sort: [SiteAdditional_Sort]): SiteAdditionalCollection
+}

@@ -1,4 +1,5 @@
 import Site from './Site';
+import SiteAdditional from './SiteAdditional';
 import SiteService from './SiteService';
 import SiteServiceImage from './SiteServiceImage';
 import SiteServiceTemplate from './SiteServiceTemplate';
@@ -406,6 +407,26 @@ export const expressRouter = function (router, config) {
     }
   );
 
+    router.get(
+        '/sitesAdditional',
+        [CollectionMetaData({entityType: 'SiteAdditional'})],
+        (req, res) => {
+            let params = getCollectionRequestParams(req);
+
+            _handleRequest(SiteAdditional.getAll(params), req, res);
+        }
+    );
+
+    router.get(
+        '/sitesAdditional/:siteId',
+        [ItemMetaData({entityType: 'SiteAdditional'})],
+        (req, res) => {
+            let siteId = _.trim(req.params.siteId );
+
+            _handleRequest(SiteAdditional.getByIdentifier(siteId), req, res);
+        }
+    );
+
   //#############################################
   //############### SITE SERVICES ###############
   //#############################################
@@ -728,6 +749,9 @@ export const serviceDescription = {
       '/sites': {
         description: 'List of sites in the information system.Each site may contain one or more services. If the site has at least one cloud service, it may also contain VM images and cloud execution templates.'
       },
+    '/sitesAdditional': {
+        description: 'List of sites in the information system.Each site may contain one or more services. If the site has at least one cloud service, it may also contain VM images and cloud execution templates.'
+    },
       '/sites/[<id> | name:<sitename> | gocdb:<pkey>]': {
         description: 'A site entry in the information system. Can be retrieved by the information system ID, the name of the site, or the pkey as provided by the gocdb portal API'
       },
