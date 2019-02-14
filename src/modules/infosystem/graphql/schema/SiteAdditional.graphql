@@ -1,3 +1,33 @@
+type StorageEndPoint {
+    qos: String
+    id: String
+    endPoint:String
+}
+
+type VirtualFlavor {
+    id: String
+    flavor: String
+}
+
+type Network {
+  lowLatency: Boolean
+  l2: String
+  publicIPs: String
+}
+
+type MesosCluster {
+  marathonEndPoints: String
+  chronosEndPoints: String
+}
+
+type IndigoSpecific {
+  storageEndPoints: [StorageEndPoint]
+  virtualFlavors: [VirtualFlavor]
+  network: Network
+  mesosCluster: MesosCluster
+}
+
+
 # Represents a Site in the information system
 # Each site may contain one or more services. If the site has at least one cloud service,
 # it may also contain VM images and cloud execution templates.
@@ -57,7 +87,7 @@ type SiteAdditional {
   # A collection of templates provided by the services of this site
   templates(filter: SiteServiceTemplate_Filter, limit: Int, skip: Int, sort: [SiteServiceTemplate_Sort]): SiteServiceTemplateCollection
   # EXTRA DATA
-  extraData: String
+  indigoSpecific: IndigoSpecific
 }
 
 # Site filtering options to help query the site collection

@@ -30,7 +30,26 @@ timezone
 latitude
 longitude
 domainName
-extraData
+indigoSpecific {
+    storageEndPoints {
+        id
+        qos
+        endPoint
+    }
+    virtualFlavors {
+        id
+        flavor
+    }
+    network {
+        lowLatency
+        l2
+        publicIPs
+    }
+    mesosCluster {
+        marathonEndPoints
+        chronosEndPoints
+    }
+}
 `;
 
 export const TEMPLATE_SITE_DETAILS_FIELDS = `

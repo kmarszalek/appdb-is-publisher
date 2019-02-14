@@ -30,7 +30,10 @@ function SiteAdditionalModel(context) {
       'longitude'           : 'info.SiteLongitude',
       'domainName'          : 'info.SiteDomainname',
       'hash'                : 'info.hash',
-      'extraData'           : 'info.SiteExtraData'
+      'indigoSpecific.storageEndPoints'    : 'info.IndigoSpecific.storageEndPoints',
+      'indigoSpecific.virtualFlavors'    : 'info.IndigoSpecific.virtualFlavors',
+      'indigoSpecific.network'    : 'info.IndigoSpecific.network',
+      'indigoSpecific.mesosCluster'    : 'info.IndigoSpecific.mesosCluster'
     },
     relationMap          : {
       'services'         : {name: 'SiteService', relationType: 'hasMany', relationOn: {key: 'info.SiteAdditionalPKey', foreignKey:  'info.SiteAdditionalPKey'}},
